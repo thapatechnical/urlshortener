@@ -1,0 +1,86 @@
+body {
+    font-family: 'urbanist', sans-serif;
+    background-color: #f0f4f8;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.container {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    width: 400px;
+    text-align: center;
+}
+
+h1 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+form div {
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+label {
+    font-weight: 500;
+    margin-bottom: 5px;
+    display: block;
+}
+
+input[type="url"],
+input[type="text"] {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+}
+
+button {
+    background-color: #4a90e2;
+    color: #fff;
+    padding: 14px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #357ac9;
+}
+
+h2 {
+    color: #555;
+    margin-top: 30px;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+li {
+    background-color: #fafafa;
+    margin: 10px 0;
+    padding: 12px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+li a {
+    color: #4a90e2;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+li a:hover {
+    text-decoration: underline;
+}
