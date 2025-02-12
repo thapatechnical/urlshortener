@@ -2,16 +2,25 @@
   "name": "url",
   "version": "1.0.0",
   "main": "app.js",
+  "type": "module",
   "scripts": {
-    "dev": "node --watch app.js",
-    "start": "node app.js"
+    "dev": "node --env-file=.env --watch app.js ",
+    "start": "node --env-file=.env app.js",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "drizzle-orm": "^0.39.3",
     "ejs": "^3.1.10",
-    "express": "^5.0.1"
+    "express": "^5.0.1",
+    "mysql2": "^3.12.0"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.30.4"
   }
 }

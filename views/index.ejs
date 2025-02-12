@@ -34,8 +34,8 @@
         </li>
         `; }) .join("") -->
 
-        <% Object.entries(links).map(([shortCode, url]) => { %> <% const
-        truncatedUrl = url.length >= 30 ? `${url.slice(0,30)}...` : url %>
+        <% links.map(({shortCode, url}) => { %> <% const truncatedUrl =
+        url.length >= 30 ? `${url.slice(0,30)}...` : url %>
 
         <li>
           <a href="/<%= shortCode %>" target="_blank">
