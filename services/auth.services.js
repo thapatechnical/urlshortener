@@ -31,8 +31,15 @@ export const comparePassword = async (password, hash) => {
   return await argon2.verify(hash, password);
 };
 
-export const generateToken = ({ id, name, email }) => {
+// export const generateToken = ({ id, name, email }) => {
+//   return jwt.sign({ id, name, email }, process.env.JWT_SECRET, {
+//     expiresIn: "30d",
+//   });
+// };
+
+
+export const generateToken =({ id, name, email }) => {
   return jwt.sign({ id, name, email }, process.env.JWT_SECRET, {
     expiresIn: "30d",
   });
-};
+}
