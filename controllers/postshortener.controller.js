@@ -8,7 +8,9 @@ import {
 export const getShortenerPage = async (req, res) => {
   try {
     const links = await getAllShortLinks();
-
+   
+    let isLoggedIn = req.cookies.isLoggedIn;;
+   
     return res.render("index", { links, host: req.host });
   } catch (error) {
     console.error(error);

@@ -13,12 +13,21 @@
         <li><a href="#section2">About</a></li>
         <li><a href="#section4">Contact</a></li>
 
-        <% if (!user) { %>
+        <!-- <% if (!user) { %>
         <a href="/login">Login</a>
         <a href="/register">Register</a>
         <% } else { %>
         <a href="/logout">Logout</a>
+        <% } %> -->
+
+        <%  if(!user){ %>
+          <a href="/login">Login</a>
+        <a href="/register">Register</a>
+        <% } else { %>
+        <a href="/logout">Logout</a>
         <% } %>
+       
+
       </ul>
     </nav>
   </body>
