@@ -4,6 +4,7 @@ import { authRoutes } from "./routes/auth.routes.js";
 import cookieParser from "cookie-parser";
 import { verifyAuthentication } from "./middlewares/verify-auth-middleware.js";
 
+
 const app = express();
 
 const PORT = process.env.PORT || 3000;
@@ -30,7 +31,7 @@ app.use((req, res, next) => {
 //? If req.user exists (typically from authentication, like Passport.js), it's stored in res.locals.user.
 //? Views (like EJS, Pug, or Handlebars) can directly access user without manually passing it in every route.
 
-// express router
+// express router 
 // app.use(router);
 app.use(authRoutes);
 app.use(shortenerRoutes);

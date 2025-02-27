@@ -31,13 +31,23 @@ export const comparePassword = async (password, hash) => {
   return await argon2.verify(hash, password);
 };
 
-export const generateToken = ({ id, name, email }) => {
+// export const generateToken = ({ id, name, email }) => {
+//   return jwt.sign({ id, name, email }, process.env.JWT_SECRET, {
+//     expiresIn: "30d",
+//   });
+// };
+
+
+export const generateToken =({ id, name, email }) => {
   return jwt.sign({ id, name, email }, process.env.JWT_SECRET, {
     expiresIn: "30d",
   });
-};
+}
 
-// verifyJWTToken
 export const verifyJWTToken = (token) => {
-  return jwt.verify(token, process.env.JWT_SECRET);
+  try {
+    return jwt.verify(token, process.env.JWT_SECRET);
+  } catch (error) {
+    return null; 
+  }
 };
