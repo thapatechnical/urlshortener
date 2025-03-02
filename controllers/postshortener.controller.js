@@ -9,7 +9,7 @@ export const getShortenerPage = async (req, res) => {
   try {
     const links = await getAllShortLinks();
 
-    return res.render("index", { links, host: req.host });
+    return res.render("index", { links, host: req.host, user: req.user });
   } catch (error) {
     console.error(error);
     return res.status(500).send("Internal server error");

@@ -2,6 +2,8 @@ import express from "express";
 import { shortenerRoutes } from "./routes/shortener.routes.js";
 import { authRoutes } from "./routes/auth.routes.js";
 import cookieParser from "cookie-parser";
+import session from "express-session";
+import flash from "connect-flash";
 import { verifyAuthentication } from "./middlewares/verify-auth-middleware.js";
 
 const app = express();
@@ -16,6 +18,10 @@ app.set("view engine", "ejs");
 
 app.use(cookieParser());
 
+app.use(
+  session({ secret: "my-secret", resave: true, saveUninitialized: false })
+);
+app.use(flash());
 // This must be after cookieParser middleware.
 app.use(verifyAuthentication);
 

@@ -4,53 +4,134 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="style.css" />
-    <title>Document</title>
+    <!-- ZMDI Material Design Iconic Font CDN -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/material-design-iconic-font@2.2.0/dist/css/material-design-iconic-font.min.css"
+    />
+    <title>URL Shortener</title>
   </head>
 
   <body>
-    <%- include('./partials/header.ejs') %> <% if(user) { %>
-    <h2>You are logged In</h2>
-    <% } else { %>
-    <h2>You are not logged In</h2>
-    <% } %>
+    <%- include('./partials/header.ejs') %>
 
-    <div class="container">
-      <h1>URL Shortener</h1>
-      <form action="/" method="post">
-        <div>
-          <label for="url">Enter URL:</label>
-          <input type="url" name="url" id="url" required />
+    <div class="main">
+      <section class="url-shortener">
+        <div class="container">
+          <div class="shortener-content">
+            <div class="user-status">
+              <% if(user) { %>
+              <div class="status-badge success">
+                <i class="zmdi zmdi-check-circle"></i>
+                <span>You are logged in</span>
+              </div>
+              <% } else { %>
+              <div class="status-badge warning">
+                <i class="zmdi zmdi-alert-circle"></i>
+                <span>You are not logged in</span>
+              </div>
+              <% } %>
+            </div>
+
+            <div class="shortener-form">
+              <h1 class="form-title">URL Shortener</h1>
+              <form action="/" method="post" class="url-form" id="url-form">
+                <div class="form-group">
+                  <label for="url">
+                    <i class="zmdi zmdi-link"></i>
+                  </label>
+                  <input
+                    type="url"
+                    name="url"
+                    id="url"
+                    placeholder="Enter URL"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="shortCode">
+                    <i class="zmdi zmdi-code"></i>
+                  </label>
+                  <input
+                    type="text"
+                    name="shortCode"
+                    id="shortCode"
+                    placeholder="Enter custom short code"
+                    required
+                  />
+                </div>
+                <div class="form-group form-button">
+                  <input
+                    type="submit"
+                    name="shorten"
+                    id="shorten"
+                    class="form-submit"
+                    value="Shorten"
+                  />
+                </div>
+              </form>
+            </div>
+
+            <div class="shortened-urls">
+              <h2 class="section-title">Shortened URLs</h2>
+              <% if(links && links.length > 0) { %>
+              <ul class="url-list">
+                <% links.map(({shortCode, url}) => { %> <% const truncatedUrl =
+                url.length >= 30 ? `${url.slice(0,30)}...` : url %>
+                <li class="url-item">
+                  <div class="url-info">
+                    <a
+                      href="/<%= shortCode %>"
+                      class="short-url"
+                      target="_blank"
+                    >
+                      <i class="zmdi zmdi-link"></i>
+                      <%= host %>/<%= shortCode %>
+                    </a>
+                    <span class="original-url"><%= truncatedUrl %></span>
+                  </div>
+                  <div class="url-actions">
+                    <button
+                      class="copy-btn"
+                      data-url="<%= host %>/<%= shortCode %>"
+                    >
+                      <i class="zmdi zmdi-copy"></i>
+                    </button>
+                  </div>
+                </li>
+                <% }) %>
+              </ul>
+              <% } else { %>
+              <p class="empty-list">
+                No shortened URLs yet. Create your first one above!
+              </p>
+              <% } %>
+            </div>
+          </div>
         </div>
-        <div>
-          <label for="shortCode">Enter shortCode:</label>
-          <input type="text" name="shortCode" id="shortCode" required />
-        </div>
-        <button type="submit">Shorten</button>
-      </form>
-
-      <h2>Shortened URLs</h2>
-      <ul>
-        <!-- {{ shortened_urls }} -->
-
-        <!-- Object.entries(links) .map(([shortCode, url]) => { url = url.length >=
-        30 ? `${url.slice(0, 30)}...` : url; return `
-        <li>
-          <a href="/${shortCode}" target="_blank">$host}/${shortCode}</a> -
-          ${url}
-        </li>
-        `; }) .join("") -->
-
-        <% links.map(({shortCode, url}) => { %> <% const truncatedUrl =
-        url.length >= 30 ? `${url.slice(0,30)}...` : url %>
-
-        <li>
-          <a href="/<%= shortCode %>" target="_blank">
-            <%= host %>/<%= shortCode %>
-          </a>
-          - <%= truncatedUrl %>
-        </li>
-        <% })%>
-      </ul>
+      </section>
     </div>
+
+    <%- include('./partials/footer.ejs') %>
+
+    <script>
+      // Simple copy to clipboard functionality
+      document.addEventListener("DOMContentLoaded", function () {
+        const copyButtons = document.querySelectorAll(".copy-btn");
+
+        copyButtons.forEach((button) => {
+          button.addEventListener("click", function () {
+            const url = this.getAttribute("data-url");
+            navigator.clipboard.writeText(url).then(() => {
+              // Visual feedback
+              this.innerHTML = '<i class="zmdi zmdi-check"></i>';
+              setTimeout(() => {
+                this.innerHTML = '<i class="zmdi zmdi-copy"></i>';
+              }, 2000);
+            });
+          });
+        });
+      });
+    </script>
   </body>
 </html>
