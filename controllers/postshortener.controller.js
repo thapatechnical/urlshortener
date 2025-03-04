@@ -7,7 +7,9 @@ import {
 
 export const getShortenerPage = async (req, res) => {
   try {
-    const links = await getAllShortLinks();
+    if (!req.user) return res.redirect("/login");
+
+    const links = await getAllShortLinks(req.user.id);
 
     return res.render("index", { links, host: req.host, user: req.user });
   } catch (error) {
@@ -18,6 +20,8 @@ export const getShortenerPage = async (req, res) => {
 
 export const postURLShortener = async (req, res) => {
   try {
+    if (!req.user) return res.redirect("/login");
+
     const { url, shortCode } = req.body;
     const finalShortCode = shortCode || crypto.randomBytes(4).toString("hex");
 
@@ -32,7 +36,11 @@ export const postURLShortener = async (req, res) => {
 
     // links[finalShortCode] = url;
 
-    await insertShortLink({ url, shortCode: finalShortCode });
+    await insertShortLink({
+      url,
+      shortCode: finalShortCode,
+      userId: req.user.id,
+    });
     return res.redirect("/");
   } catch (error) {
     console.error(error);

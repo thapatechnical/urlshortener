@@ -15,6 +15,13 @@
       "when": 1739360691055,
       "tag": "0001_confused_molten_man",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1741070320902,
+      "tag": "0002_old_scorpion",
+      "breakpoints": true
     }
   ]
 }
