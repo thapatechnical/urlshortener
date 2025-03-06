@@ -60,6 +60,12 @@
                     required
                   />
                 </div>
+
+                <% if ((errors && errors.length > 0)) { %> <%
+                errors.forEach((error) => { %>
+                <p class="flash-error"><%= error %></p>
+                <% }); %> <% } %>
+
                 <div class="form-group form-button">
                   <input
                     type="submit"
@@ -76,8 +82,9 @@
               <h2 class="section-title">Shortened URLs</h2>
               <% if(links && links.length > 0) { %>
               <ul class="url-list">
-                <% links.map(({shortCode, url}) => { %> <% const truncatedUrl =
-                url.length >= 30 ? `${url.slice(0,30)}...` : url %>
+                <% links.map(({shortCode, url, id}) => { %> <% const
+                truncatedUrl = url.length >= 30 ? `${url.slice(0,30)}...` : url
+                %>
                 <li class="url-item">
                   <div class="url-info">
                     <a
@@ -97,6 +104,18 @@
                     >
                       <i class="zmdi zmdi-copy"></i>
                     </button>
+
+                    <button class="copy-btn edit-btn">
+                      <a href="/edit/<%= id %>">
+                        <i class="zmdi zmdi-edit"></i>
+                      </a>
+                    </button>
+
+                    <form action="/delete/<%= id %>" method="post">
+                      <button class="copy-btn edit-btn">
+                        <i class="zmdi zmdi-delete"></i>
+                      </button>
+                    </form>
                   </div>
                 </li>
                 <% }) %>
