@@ -3,7 +3,8 @@ import { shortenerRoutes } from "./routes/shortener.routes.js";
 import { authRoutes } from "./routes/auth.routes.js";
 import cookieParser from "cookie-parser";
 import { verifyAuthentication } from "./middlewares/verify-auth-middleware.js";
-
+import session from "express-session";
+import flash from "connect-flash";
 
 const app = express();
 
@@ -14,6 +15,15 @@ app.use(express.urlencoded({ extended: true }));
 
 app.set("view engine", "ejs");
 // app.set("views", "./views")
+
+app.use(
+  session({
+    secret: "secret",
+    resave: true,
+    saveUninitialized: false,
+  })
+);
+app.use(flash());
 
 app.use(cookieParser());
 

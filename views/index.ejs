@@ -3,54 +3,121 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="style.css" />
-    <title>Document</title>
+    <title>URL Shortener</title>
+    <!-- Include Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Include Font Awesome for the copy icon -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
   </head>
 
-  <body>
+  <body class="bg-gray-100">
     <%- include('./partials/header.ejs') %> <% if(user) { %>
-    <h2>You are logged In</h2>
+    <h2 class="text-center text-green-600 text-2xl mt-4">You are logged In</h2>
     <% } else { %>
-    <h2>You are not logged In</h2>
+    <h2 class="text-center text-red-600 text-2xl mt-4">You are not logged In</h2>
     <% } %>
 
-    <div class="container">
-      <h1>URL Shortener</h1>
-      <form action="/" method="post">
-        <div>
-          <label for="url">Enter URL:</label>
-          <input type="url" name="url" id="url" required />
+    <div class="container mx-auto p-4 max-w-2xl">
+      <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">URL Shortener</h1>
+
+      <!-- URL Shortening Form -->
+      <form action="/" method="post" class="bg-white p-6 rounded-lg shadow-md">
+        <div class="mb-4">
+          <label for="url" class="block text-gray-700 font-medium mb-2">Enter URL:</label>
+          <input
+            type="url"
+            name="url"
+            id="url"
+            required
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="https://example.com"
+          />
         </div>
-        <div>
-          <label for="shortCode">Enter shortCode:</label>
-          <input type="text" name="shortCode" id="shortCode" required />
+        <div class="mb-4">
+          <label for="shortCode" class="block text-gray-700 font-medium mb-2">Enter Short Code:</label>
+          <input
+            type="text"
+            name="shortCode"
+            id="shortCode"
+            required
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="my-short-code"
+          />
         </div>
-        <button type="submit">Shorten</button>
+        <% if (error && error.length > 0) { %>
+          <% error.forEach((err) => { %>
+            <p class="text-red-500 text-sm mb-4"><%= err %></p>
+          <% }); %>
+        <% } %>
+        <button
+          type="submit"
+          class="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-200"
+        >
+          Shorten URL
+        </button>
       </form>
 
-      <h2>Shortened URLs</h2>
-      <ul>
-        <!-- {{ shortened_urls }} -->
-
-        <!-- Object.entries(links) .map(([shortCode, url]) => { url = url.length >=
-        30 ? `${url.slice(0, 30)}...` : url; return `
-        <li>
-          <a href="/${shortCode}" target="_blank">$host}/${shortCode}</a> -
-          ${url}
-        </li>
-        `; }) .join("") -->
-
-        <% links.map(({shortCode, url}) => { %> <% const truncatedUrl =
-        url.length >= 30 ? `${url.slice(0,30)}...` : url %>
-
-        <li>
-          <a href="/<%= shortCode %>" target="_blank">
-            <%= host %>/<%= shortCode %>
-          </a>
-          - <%= truncatedUrl %>
-        </li>
-        <% })%>
+      <!-- Shortened URLs List -->
+      <h2 class="text-2xl font-bold text-gray-800 mt-8 mb-4">Shortened URLs</h2>
+      <ul class="bg-white p-6 rounded-lg shadow-md">
+        <% if (links && links.length > 0) { %>
+          <% links.forEach(({ shortCode, url, id }) => { %>
+            <% const truncatedUrl = url.length >= 30 ? `${url.slice(0, 30)}...` : url; %>
+            <li class="flex items-center justify-between mb-4">
+              <div>
+                <a
+                  href="/<%= shortCode %>"
+                  target="_blank"
+                  class="text-blue-500 hover:underline"
+                >
+                  <%= host %>/<%= shortCode %>
+                </a>
+                <span class="text-gray-600">- <%= truncatedUrl %></span>
+              </div>
+              <!-- Copy Button -->
+              <button
+                class="copy-btn bg-gray-200 p-2 rounded-lg hover:bg-gray-300 transition duration-200"
+                data-url="<%= host %>/<%= shortCode %>"
+              >
+                <i class="fas fa-copy text-gray-700"></i>
+              </button>
+              <button
+                class="copy-btn bg-gray-200 p-2 rounded-lg hover:bg-gray-300 transition duration-200"
+              >
+              <a href="/edit/<%= id %>" class="text-blue-500 hover:underline">Edit</a>
+                <i class="fas fa-edit text-blue-700"></i>
+              </button>
+              
+            </li>
+          <% }); %>
+        <% } else { %>
+          <li class="text-gray-600">No shortened URLs found.</li>
+        <% } %>
       </ul>
     </div>
+
+    <!-- JavaScript to handle the copy functionality -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const copyButtons = document.querySelectorAll('.copy-btn');
+
+        copyButtons.forEach((button) => {
+          button.addEventListener('click', function () {
+            const urlToCopy = this.getAttribute('data-url');
+            navigator.clipboard
+              .writeText(urlToCopy)
+              .then(() => {
+                alert('URL copied to clipboard: ' + urlToCopy);
+              })
+              .catch((err) => {
+                console.error('Failed to copy URL: ', err);
+              });
+          });
+        });
+      });
+    </script>
   </body>
 </html>

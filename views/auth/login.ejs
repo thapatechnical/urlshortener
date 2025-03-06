@@ -4,92 +4,120 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login Page</title>
-    <link rel="stylesheet" href="/style.css" />
+    <!-- Include Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Include Material Icons (for icons) -->
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
   </head>
-  <body>
+  <body class="bg-gray-100">
     <%- include('../partials/header') %>
 
-    <h1>Login Page</h1>
+    <!-- Login Page Content -->
+    <section class="flex items-center justify-center min-h-screen p-4">
+      <div class="bg-white rounded-lg shadow-lg overflow-hidden w-full max-w-4xl flex">
+        <!-- Image Section -->
+        <div class="hidden md:block w-1/2 bg-blue-600 p-8 flex items-center justify-center">
+          <figure>
+            <img
+              src="images/signin-image.jpg"
+              alt="Sign In Image"
+              class="w-full h-auto rounded-lg"
+            />
+          </figure>
+        </div>
 
-    <!-- Sing in  Form -->
-    <section class="sign-in">
-      <div class="container">
-        <div class="signin-content">
-          <div class="signin-image">
-            <figure>
-              <img src="images/signin-image.jpg" alt="sing up image" />
-            </figure>
-            <a href="/register" class="signup-image-link">Create an account</a>
+        <!-- Form Section -->
+        <div class="w-full md:w-1/2 p-8">
+          <h2 class="text-2xl font-bold text-gray-800 mb-6">Sign In</h2>
+
+          <!-- Login Form -->
+          <form action="/login" method="POST" class="space-y-6">
+            <!-- Email Input -->
+            <div class="flex items-center border-b border-gray-300 py-2">
+              <span class="material-icons text-gray-500 mr-2">person</span>
+              <input
+                type="email"
+                name="email"
+                id="email"
+                placeholder="Enter Your Email"
+                class="w-full outline-none focus:border-blue-500"
+                required
+              />
+            </div>
+
+            <!-- Password Input -->
+            <div class="flex items-center border-b border-gray-300 py-2">
+              <span class="material-icons text-gray-500 mr-2">lock</span>
+              <input
+                type="password"
+                name="password"
+                id="your_pass"
+                placeholder="Password"
+                class="w-full outline-none focus:border-blue-500"
+                required
+              />
+            </div>
+
+            <!-- Remember Me Checkbox -->
+            <div class="flex items-center">
+              <input
+                type="checkbox"
+                name="remember-me"
+                id="remember-me"
+                class="mr-2"
+              />
+              <label for="remember-me" class="text-gray-700">Remember me</label>
+            </div>
+
+            <!-- Error Messages -->
+            <% if (error && error.length > 0) { %>
+              <% error.forEach((error) => { %>
+                <p class="text-red-500 text-sm"><%= error %></p>
+              <% }); %>
+            <% } %>
+
+            <!-- Submit Button -->
+            <button
+              type="submit"
+              class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200"
+            >
+              Log In
+            </button>
+          </form>
+
+          <!-- Create Account Link -->
+          <div class="mt-6 text-center">
+            <p class="text-gray-600">
+              Don't have an account?
+              <a href="/register" class="text-blue-600 hover:underline">Create an account</a>
+            </p>
           </div>
 
-          <div class="signin-form">
-            <h2 class="form-title">Sign up</h2>
-            <form
-              action="/login"
-              method="POST"
-              class="register-form"
-              id="login-form"
-            >
-              <div class="form-group">
-                <label for="email"
-                  ><i class="zmdi zmdi-account material-icons-name"></i
-                ></label>
-                <input
-                  type="email"
-                  name="email"
-                  id="email"
-                  placeholder="Enter Your Email"
-                />
-              </div>
-              <div class="form-group">
-                <label for="your_pass"><i class="zmdi zmdi-lock"></i></label>
-                <input
-                  type="password"
-                  name="password"
-                  id="your_pass"
-                  placeholder="Password"
-                />
-              </div>
-              <div class="form-group">
-                <input
-                  type="checkbox"
-                  name="remember-me"
-                  id="remember-me"
-                  class="agree-term"
-                />
-                <label for="remember-me" class="label-agree-term"
-                  ><span><span></span></span>Remember me</label
-                >
-              </div>
-              <div class="form-group form-button">
-                <input
-                  type="submit"
-                  name="signin"
-                  id="signin"
-                  class="form-submit"
-                  value="Log in"
-                />
-              </div>
-            </form>
-            <div class="social-login">
-              <span class="social-label">Or login with</span>
-              <ul class="socials">
-                <li>
-                  <a href="#"
-                    ><i class="display-flex-center zmdi zmdi-facebook"></i
-                  ></a>
-                </li>
-                <li>
-                  <a href="#"
-                    ><i class="display-flex-center zmdi zmdi-twitter"></i
-                  ></a>
-                </li>
-                <li>
-                  <a href="#"
-                    ><i class="display-flex-center zmdi zmdi-google"></i
-                  ></a>
-                </li>
-              </ul>
+          <!-- Social Login Section -->
+          <div class="mt-8">
+            <p class="text-center text-gray-600 mb-4">Or login with</p>
+            <div class="flex justify-center space-x-4">
+              <a
+                href="#"
+                class="bg-gray-200 p-2 rounded-full hover:bg-gray-300 transition duration-200"
+              >
+                <span class="material-icons text-gray-700">facebook</span>
+              </a>
+              <a
+                href="#"
+                class="bg-gray-200 p-2 rounded-full hover:bg-gray-300 transition duration-200"
+              >
+                <span class="material-icons text-gray-700">twitter</span>
+              </a>
+              <a
+                href="#"
+                class="bg-gray-200 p-2 rounded-full hover:bg-gray-300 transition duration-200"
+              >
+                <span class="material-icons text-gray-700">google</span>
+              </a>
             </div>
           </div>
         </div>

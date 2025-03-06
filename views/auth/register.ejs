@@ -3,100 +3,104 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Registration Form</title>
-
-    <!-- Font Icon -->
+    <!-- Include Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Include Material Icons (for icons) -->
     <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
       rel="stylesheet"
-      href="fonts/material-icon/css/material-design-iconic-font.min.css"
     />
-
-    <!-- Main css -->
-    <link rel="stylesheet" href="style.css" />
   </head>
-  <body>
+  <body class="bg-gray-100">
     <%- include('../partials/header') %>
 
-    <div class="main">
-      <!-- Sign up form -->
-      <section class="signup">
-        <div class="container">
-          <div class="signup-content">
-            <div class="signup-form">
-              <h2 class="form-title">Sign up</h2>
-              <form
-                action="/register"
-                method="POST"
-                class="register-form"
-                id="register-form"
-              >
-                <div class="form-group">
-                  <label for="name"
-                    ><i class="zmdi zmdi-account material-icons-name"></i
-                  ></label>
-                  <input
-                    type="text"
-                    name="name"
-                    id="name"
-                    placeholder="Your Name"
-                  />
-                </div>
-                <div class="form-group">
-                  <label for="email"><i class="zmdi zmdi-email"></i></label>
-                  <input
-                    type="email"
-                    name="email"
-                    autocomplete="off"
-                    id="email"
-                    placeholder="Your Email"
-                  />
-                </div>
-                <div class="form-group">
-                  <label for="pass"><i class="zmdi zmdi-lock"></i></label>
-                  <input
-                    type="password"
-                    name="password"
-                    id="pass"
-                    placeholder="Password"
-                  />
-                </div>
+    <!-- Registration Form Section -->
+    <section class="flex items-center justify-center min-h-screen p-4">
+      <div class="bg-white rounded-lg shadow-lg overflow-hidden w-full max-w-4xl flex">
+        <!-- Form Section -->
+        <div class="w-full md:w-1/2 p-8">
+          <h2 class="text-2xl font-bold text-gray-800 mb-6">Sign Up</h2>
 
-                <!-- <div class="form-group">
-                  <input
-                    type="checkbox"
-                    name="agree-term"
-                    id="agree-term"
-                    class="agree-term"
-                  />
-                  <label for="agree-term" class="label-agree-term"
-                    ><span><span></span></span>I agree all statements in
-                    <a href="#" class="term-service">Terms of service</a></label
-                  >
-                </div> -->
-                <div class="form-group form-button">
-                  <input
-                    type="submit"
-                    name="signup"
-                    id="signup"
-                    class="form-submit"
-                    value="Register"
-                  />
-                </div>
-              </form>
+          <!-- Registration Form -->
+          <form action="/register" method="POST" class="space-y-6">
+            <!-- Name Input -->
+            <div class="flex items-center border-b border-gray-300 py-2">
+              <span class="material-icons text-gray-500 mr-2">person</span>
+              <input
+                type="text"
+                name="name"
+                id="name"
+                placeholder="Your Name"
+                class="w-full outline-none focus:border-blue-500"
+                required
+              />
             </div>
-            <div class="signup-image">
-              <figure>
-                <img src="images/signup-image.jpg" alt="sing up image" />
-              </figure>
-              <a href="/login" class="signup-image-link">I am already member</a>
+
+            <!-- Email Input -->
+            <div class="flex items-center border-b border-gray-300 py-2">
+              <span class="material-icons text-gray-500 mr-2">email</span>
+              <input
+                type="email"
+                name="email"
+                id="email"
+                placeholder="Your Email"
+                class="w-full outline-none focus:border-blue-500"
+                required
+              />
             </div>
+
+            <!-- Password Input -->
+            <div class="flex items-center border-b border-gray-300 py-2">
+              <span class="material-icons text-gray-500 mr-2">lock</span>
+              <input
+                type="password"
+                name="password"
+                id="pass"
+                placeholder="Password"
+                class="w-full outline-none focus:border-blue-500"
+                required
+              />
+            </div>
+
+            <!-- Error Messages -->
+            <% if (error && error.length > 0) { %>
+              <% error.forEach((error) => { %>
+                <p class="text-red-500 text-sm"><%= error %></p>
+              <% }); %>
+            <% } %>
+
+            <!-- Submit Button -->
+            <button
+              type="submit"
+              class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200"
+            >
+              Register
+            </button>
+          </form>
+
+          <!-- Login Link -->
+          <div class="mt-6 text-center">
+            <p class="text-gray-600">
+              Already have an account?
+              <a href="/login" class="text-blue-600 hover:underline">Login here</a>
+            </p>
           </div>
         </div>
-      </section>
-    </div>
+
+        <!-- Image Section -->
+        <div class="hidden md:block w-1/2 bg-blue-600 p-8 flex items-center justify-center">
+          <figure>
+            <img
+              src="images/signup-image.jpg"
+              alt="Sign Up Image"
+              class="w-full h-auto rounded-lg"
+            />
+          </figure>
+        </div>
+      </div>
+    </section>
 
     <%- include('../partials/footer.ejs') %>
-    <!-- JS -->
   </body>
 </html>

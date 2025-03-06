@@ -5,11 +5,12 @@ import {
   getUserByEmail,
   hashPassword,
 } from "../services/auth.services.js";
+import { registerUserSchema, loginUserSchema } from "../validators/auth.validator.js";
 
 export const getRegisterPage = (req, res) => {
   if (req.user) return res.redirect("/");
 
-  return res.render("../views/auth/register");
+  return res.render("../views/auth/register", { error: req.flash("error") });
 };
 
 export const postRegister = async (req, res) => {
@@ -18,10 +19,24 @@ export const postRegister = async (req, res) => {
   // console.log(req.body);
   const { name, email, password } = req.body;
 
+ const {data, error} = registerUserSchema.safeParse(req.body);
+ console.log("data", data);
+ 
+  if (error) {
+    const errors = error.errors.map((err) => err.message);
+    req.flash("error", error.message);
+    return res.redirect("/register");
+  }
+
   const userExists = await getUserByEmail(email);
   console.log("userExists ", userExists);
 
-  if (userExists) return res.redirect("/register");
+  // if (userExists) return res.redirect("/register");
+
+  if(userExists){
+    req.flash("error", "User already exists");
+    return res.redirect("/register");
+  }
 
   const hashedPassword = await hashPassword(password);
 
@@ -34,23 +49,40 @@ export const postRegister = async (req, res) => {
 export const getLoginPage = (req, res) => {
   if (req.user) return res.redirect("/");
 
-  return res.render("auth/login");
+  return res.render("auth/login", { error: req.flash("error") });
 };
 
 export const postLogin = async (req, res) => {
   if (req.user) return res.redirect("/");
 
   const { email, password } = req.body;
+  const{data, error} = loginUserSchema.safeParse(req.body);
+  console.log("data", data);
+
+  if (error) {
+    const errors = error.errors[0].message;
+    req.flash("error", error.message);
+    return res.redirect("/login");
+  }
 
   const user = await getUserByEmail(email);
   console.log("user email", user);
 
-  if (!user) return res.redirect("/login");
+  if (!user) {
+    req.flash("error", "User not found");
+    return res.redirect("/login");
+  } 
+
+
+
   //todo bcrypt.compare(plainTextPassword, hashedPassword);
   const isPasswordValid = await comparePassword(password, user.password);
 
   // if (user.password !== password) return res.redirect("/login");
-  if (!isPasswordValid) return res.redirect("/login");
+  if (!isPasswordValid){
+    req.flash("error", "Invalid email or password");
+    return res.redirect("/login");
+  } 
 
   // res.cookie("isLoggedIn", true);
 

@@ -3,32 +3,49 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>URL Shortener</title>
+    <!-- Include Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
   </head>
-  <body>
+  <body class="bg-gray-100">
     <!-- Navbar -->
-    <nav class="navbar">
-      <ul class="navbar-links">
-        <li><a href="/">Home</a></li>
-        <li><a href="#section2">About</a></li>
-        <li><a href="#section4">Contact</a></li>
+    <nav class="bg-blue-600 p-4 shadow-md">
+      <div class="container mx-auto flex justify-between items-center">
+        <!-- Logo or Brand Name -->
+        <a href="/" class="text-white text-xl font-bold">URL Shortener</a>
 
-        <!-- <% if (!user) { %>
-        <a href="/login">Login</a>
-        <a href="/register">Register</a>
-        <% } else { %>
-        <a href="/logout">Logout</a>
-        <% } %> -->
+        <!-- Navbar Links -->
+        <ul class="flex space-x-6">
+          <li>
+            <a href="/" class="text-white hover:text-gray-200 transition duration-200">Home</a>
+          </li>
+          <li>
+            <a href="#section2" class="text-white hover:text-gray-200 transition duration-200">About</a>
+          </li>
+          <li>
+            <a href="#section4" class="text-white hover:text-gray-200 transition duration-200">Contact</a>
+          </li>
 
-        <%  if(!user){ %>
-          <a href="/login">Login</a>
-        <a href="/register">Register</a>
-        <% } else { %>
-        <a href="/logout">Logout</a>
-        <% } %>
-       
-
-      </ul>
+          <!-- Conditional Rendering for Login/Register or Logout -->
+          <% if (!user) { %>
+          <li>
+            <a href="/login" class="text-white hover:text-gray-200 transition duration-200">Login</a>
+          </li>
+          <li>
+            <a href="/register" class="text-white hover:text-gray-200 transition duration-200">Register</a>
+          </li>
+          <% } else { %>
+          <li>
+            <a href="/logout" class="text-white hover:text-gray-200 transition duration-200">Logout</a>
+          </li>
+          <% } %>
+        </ul>
+      </div>
     </nav>
+
+    <!-- Main Content -->
+    <div class="container mx-auto p-4">
+      <h1 class="text-3xl font-bold text-center text-gray-800 mt-8">Welcome to the URL Shortener</h1>
+    </div>
   </body>
 </html>

@@ -1,3 +1,25 @@
-<footer style="margin: 1rem 0">
-  <strong>Copyright - <%= new Date().getFullYear(); %></strong>
-</footer>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Footer Example</title>
+    <!-- Include Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-100">
+    <!-- Your content goes here -->
+    <div class="container mx-auto p-4">
+      <h1 class="text-3xl font-bold text-center text-gray-800">Welcome to My Website</h1>
+      <p class="text-gray-600 text-center mt-4">
+        This is an example website with a stylish footer.
+      </p>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 py-6 text-center mt-8">
+      <strong class="text-white text-lg">Copyright - <%= new Date().getFullYear(); %></strong>
+      <p class="text-gray-400 mt-2">All rights reserved.</p>
+    </footer>
+  </body>
+</html>
