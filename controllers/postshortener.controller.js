@@ -8,6 +8,7 @@ import {
   updateShortCode,
 } from "../services/shortener.services.js";
 import z from "zod";
+import { shortenerSchema } from "../validators/shortener-validator.js";
 
 export const getShortenerPage = async (req, res) => {
   try {
@@ -30,7 +31,19 @@ export const postURLShortener = async (req, res) => {
   try {
     if (!req.user) return res.redirect("/login");
 
-    const { url, shortCode } = req.body;
+    // const { url, shortCode } = req.body;
+
+    const { data, error } = shortenerSchema.safeParse(req.body);
+    console.log(data, error);
+
+    if (error) {
+      const errorMessage = error.errors[0].message;
+      req.flash("errors", errorMessage);
+      return res.redirect("/");
+    }
+
+    const { url, shortCode } = data;
+
     const finalShortCode = shortCode || crypto.randomBytes(4).toString("hex");
 
     // const links = await loadLinks();
