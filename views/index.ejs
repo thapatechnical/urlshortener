@@ -11,6 +11,8 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
     />
+    <!-- Include SweetAlert for better alerts -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   </head>
 
   <body class="bg-gray-100">
@@ -65,7 +67,7 @@
       <ul class="bg-white p-6 rounded-lg shadow-md">
         <% if (links && links.length > 0) { %>
           <% links.forEach(({ shortCode, url, id }) => { %>
-            <% const truncatedUrl = url.length >= 30 ? `${url.slice(0, 30)}...` : url; %>
+            <% const truncatedUrl = url.length >= 30 ? `${url.slice(0, 15)}...${url.slice(-15)}` : url; %>
             <li class="flex items-center justify-between mb-4">
               <div>
                 <a
@@ -84,13 +86,26 @@
               >
                 <i class="fas fa-copy text-gray-700"></i>
               </button>
-              <button
-                class="copy-btn bg-gray-200 p-2 rounded-lg hover:bg-gray-300 transition duration-200"
-              >
-              <a href="/edit/<%= id %>" class="text-blue-500 hover:underline">Edit</a>
-                <i class="fas fa-edit text-blue-700"></i>
-              </button>
+              <!-- Edit Button -->
+              <% if (id) { %>
+                <a
+                  href="/edit/<%= id %>"
+                  class="bg-green-200 p-2 rounded-lg hover:bg-green-300 transition duration-200 text-green-500 hover:underline"
+                >
+                  <i class="fas fa-edit text-green-700"></i>
+                </a>
+              <% } else { %>
+                <span class="text-red-500">No ID</span>
+              <% } %>
+              <!-- Delete Button -->
+               <form action="/delete/<%= id %>" method="post">
+             <button
+                class="bg-red-200 p-2 rounded-lg hover:bg-red-300 transition duration-200 text-red-500 hover:underline">
               
+                <i class="fas fa-trash text-red-700"></i>
+           
+              </button>
+            </form>
             </li>
           <% }); %>
         <% } else { %>
@@ -110,9 +125,18 @@
             navigator.clipboard
               .writeText(urlToCopy)
               .then(() => {
-                alert('URL copied to clipboard: ' + urlToCopy);
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Copied!',
+                  text: 'URL copied to clipboard.',
+                });
               })
               .catch((err) => {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Failed to copy',
+                  text: 'Please try again.',
+                });
                 console.error('Failed to copy URL: ', err);
               });
           });

@@ -29,3 +29,21 @@ export const findShortLinkById = async (id) => {
 
   return result;
 }
+
+
+// updateShortCode
+
+export const updateShortCode = async ({ id, url, shortCode }) => {
+   return await db
+    .update(shortLinksTable)
+    .set({ url:url, shortCode })
+    .where(eq(shortLinksTable.id, id))
+
+};
+
+export const deleteShortCodeById = async (id) => {
+ return await db.
+ delete().
+ where(eq(shortLinksTable.id, id));
+};
+

@@ -3,9 +3,12 @@ import {
   getAllShortLinks,
   getShortLinkByShortCode,
   insertShortLink,
-  findShortLinkById, // This is the correct function name
+  findShortLinkById,
+  updateShortCode,
+  deleteShortCodeById, // This is the correct function name
 } from "../services/shortener.services.js";
 import { z } from "zod";
+import { error } from "console";
 
 export const getShortenerPage = async (req, res) => {
   try {
@@ -67,12 +70,20 @@ export const redirectToShortLink = async (req, res) => {
 export const getShortenerEditPage = async (req, res) => {
   if (!req.user) return res.redirect("/login");
 
+  console.log("Requested ID:", req.params.id); // Debugging: Log the requested ID
+
   const { data: id, error: idError } = z.coerce.number().int().safeParse(req.params.id);
-  if (idError) return res.redirect("/");
+  if (idError) {
+    console.error("ID Parsing Error:", idError); // Debugging: Log the parsing error
+    return res.redirect("/");
+  }
 
   try {
-    const shortLink = await findShortLinkById(id); // Use `findShortLinkById` instead of `getShortLinkById`
-    if (!shortLink) return res.status(404).send("404 error occurred");
+    const shortLink = await findShortLinkById(id);
+    if (!shortLink) {
+      console.error("Short link not found for ID:", id); // Debugging: Log if the link is not found
+      return res.status(404).send("404 error occurred");
+    }
 
     res.render("edit-shortLink", {
       id: shortLink.id,
@@ -83,5 +94,77 @@ export const getShortenerEditPage = async (req, res) => {
   } catch (error) {
     console.error(error);
     return res.status(500).send("Internal server error");
+  }
+};
+
+// export const postshortenerEditPage = async (req, res) => {
+//   if (!req.user) return res.redirect("/login");
+
+//   console.log("Requested ID:", req.params.id); // Debugging: Log the requested ID
+
+//   const { data: id, error: idError } = z.coerce.number().int().safeParse(req.params.id);
+//  if(error) return res.redirect("/404");
+//   try {
+//     const { url, shortCode } = req.body;
+//     const newupdatedShortCode = await updateShortCode({id, url, shortCode});
+//     if (!newupdatedShortCode) {
+//       console.error("Short link not found for ID:", id); // Debugging: Log if the link is not found
+//       return res.status(404).send("404 error occurred");
+//       res.redirect("/");
+//     }
+//   } catch (error) {
+//     if(error.code === "ER_DUP_ENTRY") {
+//       req.flash("errors", "Short code already exists. Please choose another.");
+//       return res.redirect(`/edit/${id}`);
+//     };
+//     console.error(error);
+//     return res.status(500).send("Internal server error");
+//   }
+
+// }
+
+// deleteshortcode
+
+
+export const postshortenerEditPage = async (req, res) => {
+  if (!req.user) return res.redirect("/login");
+
+  console.log("Requested ID:", req.params.id); // Debugging: Log the requested ID
+
+  const { data: id, error: idError } = z.coerce.number().int().safeParse(req.params.id);
+  if (idError) return res.redirect("/404");
+
+  try {
+    const { url, shortCode } = req.body;
+    const newUpdatedShortCode = await updateShortCode({ id, url, shortCode });
+    
+    if (!newUpdatedShortCode) {
+      console.error("Short link not found for ID:", id); // Debugging: Log if the link is not found
+      return res.status(404).send("404 error occurred");
+    }
+
+    return res.redirect("/");
+
+  } catch (error) {
+    if (error.code === "ER_DUP_ENTRY") {
+      req.flash("errors", "Short code already exists. Please choose another.");
+      return res.redirect(`/edit/${id}`);
+    }
+    console.error(error);
+    return res.status(500).send("Internal server error");
+  }
+};
+export const deleteShortCode = async (req, res) => {
+  try {
+    const { data: id, error: idError } = z.coerce.number().int().safeParse(req.params.id);
+    if(error) return res.redirect("/404");
+ 
+    await deleteShortCodeById(id);
+    return res.redirect("/");
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send("Internal server error");
+    
   }
 };
