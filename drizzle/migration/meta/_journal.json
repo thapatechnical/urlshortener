@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1739340934909,
-      "tag": "0000_friendly_rafael_vega",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1739360691055,
-      "tag": "0001_confused_molten_man",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1741070320902,
-      "tag": "0002_old_scorpion",
+      "when": 1741589892989,
+      "tag": "0000_pink_lockjaw",
       "breakpoints": true
     }
   ]
