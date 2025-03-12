@@ -1,9 +1,10 @@
 import { eq } from "drizzle-orm";
 import { db } from "../config/db.js";
-import { usersTable } from "../drizzle/schema.js";
+import { sessionsTable, usersTable } from "../drizzle/schema.js";
 // import bcrypt from "bcrypt";
 import argon2 from "argon2";
 import jwt from "jsonwebtoken";
+import { ACCESS_TOKEN_EXPIRY, MILLISECONDS_PER_SECOND } from "../config/constants.js";
 
 export const getUserByEmail = async (email) => {
   const [user] = await db
@@ -43,6 +44,22 @@ export const generateToken =({ id, name, email }) => {
     expiresIn: "30d",
   });
 }
+
+export const createSession = async(userId,{ip,userAgent})=>{
+  const [session] = await db
+  .insert(sessionsTable)
+  .values({userId,ip, userAgent})
+  .$returningId();
+  return session;
+}
+
+export const createAccessToken = async (id,name,email,sessionId)=>{
+    return jwt.sign({id,name,email,sessionId},process.env.JWT_SECRET,{
+      expiresIn:ACCESS_TOKEN_EXPIRY/ MILLISECONDS_PER_SECOND,
+    })
+};
+
+
 
 export const verifyJWTToken = (token) => {
   try {
