@@ -3,6 +3,8 @@ import {
   REFRESH_TOKEN_EXPIRY,
 } from "../config/constants.js";
 import {
+  authenticateUser,
+  clearUserSession,
   comparePassword,
   createAccessToken,
   createRefreshToken,
@@ -51,9 +53,13 @@ export const postRegister = async (req, res) => {
   const hashedPassword = await hashPassword(password);
 
   const [user] = await createUser({ name, email, password: hashedPassword });
-  console.log(user);
+  console.log("user register", user);
 
-  res.redirect("/login");
+  // res.redirect("/login");
+
+  await authenticateUser({ req, res, user, name, email });
+
+  res.redirect("/");
 };
 
 export const getLoginPage = (req, res) => {
@@ -104,31 +110,7 @@ export const postLogin = async (req, res) => {
   // res.cookie("access_token", token);
 
   // we need to create a sessions
-  const session = await createSession(user.id, {
-    ip: req.clientIp,
-    userAgent: req.headers["user-agent"],
-  });
-
-  const accessToken = createAccessToken({
-    id: user.id,
-    name: user.name,
-    email: user.email,
-    sessionId: session.id,
-  });
-
-  const refreshToken = createRefreshToken(session.id);
-
-  const baseConfig = { httpOnly: true, secure: true };
-
-  res.cookie("access_token", accessToken, {
-    ...baseConfig,
-    maxAge: ACCESS_TOKEN_EXPIRY,
-  });
-
-  res.cookie("refresh_token", refreshToken, {
-    ...baseConfig,
-    maxAge: REFRESH_TOKEN_EXPIRY,
-  });
+  await authenticateUser({ req, res, user });
 
   res.redirect("/");
 };
@@ -141,7 +123,10 @@ export const getMe = (req, res) => {
   return res.send(`<h1>Hey ${req.user.name} - ${req.user.email}</h1>`);
 };
 
-export const logoutUser = (req, res) => {
+export const logoutUser = async (req, res) => {
+  await clearUserSession(req.user.sessionId);
+
   res.clearCookie("access_token");
+  res.clearCookie("refresh_token");
   res.redirect("/login");
 };

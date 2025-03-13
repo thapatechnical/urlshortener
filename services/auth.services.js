@@ -70,3 +70,92 @@ export const createRefreshToken = (sessionId) => {
 export const verifyJWTToken = (token) => {
   return jwt.verify(token, process.env.JWT_SECRET);
 };
+
+// /findSessionById
+export const findSessionById = async (sessionId) => {
+  const [session] = await db
+    .select()
+    .from(sessionsTable)
+    .where(eq(sessionsTable.id, sessionId));
+
+  return session;
+};
+
+//findUserById
+export const findUserById = async (userId) => {
+  const [user] = await db
+    .select()
+    .from(usersTable)
+    .where(eq(usersTable.id, userId));
+
+  return user;
+};
+
+//refreshTokens
+export const refreshTokens = async (refreshToken) => {
+  try {
+    const decodedToken = verifyJWTToken(refreshToken);
+    const currentSession = await findSessionById(decodedToken.sessionId);
+
+    if (!currentSession || !currentSession.valid) {
+      throw new Error("Invalid session");
+    }
+
+    const user = await findUserById(currentSession.userId);
+
+    if (!user) throw new Error("Invalid User");
+
+    const userInfo = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      sessionId: currentSession.id,
+    };
+
+    const newAccessToken = createAccessToken(userInfo);
+    const newRefreshToken = createRefreshToken(currentSession.id);
+
+    return {
+      newAccessToken,
+      newRefreshToken,
+      user: userInfo,
+    };
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
+// clearUserSession
+export const clearUserSession = async (sessionId) => {
+  return db.delete(sessionsTable).where(eq(sessionsTable.id, sessionId));
+};
+
+//
+export const authenticateUser = async ({ req, res, user, name, email }) => {
+  // we need to create a sessions
+  const session = await createSession(user.id, {
+    ip: req.clientIp,
+    userAgent: req.headers["user-agent"],
+  });
+
+  const accessToken = createAccessToken({
+    id: user.id,
+    name: user.name || name,
+    email: user.email || email,
+    sessionId: session.id,
+  });
+
+  const refreshToken = createRefreshToken(session.id);
+
+  const baseConfig = { httpOnly: true, secure: true };
+
+  res.cookie("access_token", accessToken, {
+    ...baseConfig,
+    maxAge: ACCESS_TOKEN_EXPIRY,
+  });
+
+  res.cookie("refresh_token", refreshToken, {
+    ...baseConfig,
+    maxAge: REFRESH_TOKEN_EXPIRY,
+  });
+};
