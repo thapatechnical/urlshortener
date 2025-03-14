@@ -2,11 +2,13 @@ import { name } from "ejs";
 import {
   comparePassword,
   createAccessToken,
+  
   createSession,
   createUser,
   generateToken,
   getUserByEmail,
   hashPassword,
+  refreshTokens,
   
 } from "../services/auth.services.js";
 import { registerUserSchema, loginUserSchema } from "../validators/auth.validator.js";
@@ -116,7 +118,7 @@ const accessToken = createAccessToken({
 res.cookie("access_token",token);
 
 
-const refreshToken = createRefreshToken(session.id);
+const refreshToken = refreshTokens(session.id);
 
 const baseConfig = { httpOnly:true, secure:true };
 
