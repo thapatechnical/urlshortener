@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profile Form</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <%- include('../partials/header') %>
+    
+    <main class="container mx-auto p-6">
+        <h1 class="text-3xl font-bold text-center mb-6">Your Profile</h1>
+        
+        <div class="flex justify-center mb-6">
+            <% if(user) { %>
+            <div class="flex items-center bg-green-500 text-white px-4 py-2 rounded shadow">
+                <i class="zmdi zmdi-check-circle mr-2"></i>
+                <span>You are logged in</span>
+            </div>
+            <% } else { %>
+            <div class="flex items-center bg-yellow-500 text-white px-4 py-2 rounded shadow">
+                <i class="zmdi zmdi-alert-circle mr-2"></i>
+                <span>You are not logged in</span>
+            </div>
+            <% } %>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-md max-w-lg mx-auto">
+            <div class="flex items-center space-x-4">
+                <div class="w-16 h-16 flex items-center justify-center bg-blue-500 text-white text-2xl font-bold rounded-full">
+                    <%= user.name.charAt(0).toUpperCase() %>
+                </div>
+                <div>
+                    <h2 class="text-xl font-semibold"><%= user.name %></h2>
+                    <p class="text-gray-600 flex items-center">
+                        <i class="zmdi zmdi-email mr-2"></i> <%= user.email %>
+                    </p>
+                    <p class="text-gray-600 flex items-center">
+                        <i class="zmdi zmdi-calendar mr-2"></i> Member since <%= new Date(user.createdAt).toLocaleDateString() %>
+                    </p>
+                </div>
+            </div>
+
+            <div class="mt-6 grid grid-cols-3 gap-4 text-center">
+                <div class="bg-gray-200 p-4 rounded">
+                    <span class="block text-xl font-bold"><%= user.links ? user.links.length : 0 %></span>
+                    <span class="text-gray-600">Links Created</span>
+                </div>
+                <div class="bg-gray-200 p-4 rounded">
+                    <span class="block text-xl font-bold"><%= user.totalClicks || 0 %></span>
+                    <span class="text-gray-600">Total Clicks</span>
+                </div>
+                <div class="bg-gray-200 p-4 rounded">
+                    <span class="block text-xl font-bold">
+                        <%= user.lastActive ? new Date(user.lastActive).toLocaleDateString() : 'Today' %>
+                    </span>
+                    <span class="text-gray-600">Last Active</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-center space-x-4 mt-6">
+            <a href="/edit-profile" class="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600">
+                <i class="zmdi zmdi-edit"></i> Edit Profile
+            </a>
+            <a href="/change-password" class="bg-gray-500 text-white px-4 py-2 rounded shadow hover:bg-gray-600">
+                <i class="zmdi zmdi-key"></i> Change Password
+            </a>
+            <a href="/logout" class="bg-red-500 text-white px-4 py-2 rounded shadow hover:bg-red-600">
+                <i class="zmdi zmdi-power"></i> Logout
+            </a>
+        </div>
+    </main>
+
+    <%- include('../partials/footer.ejs') %>
+</body>
+</html>

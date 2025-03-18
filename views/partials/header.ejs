@@ -26,7 +26,7 @@
             <a href="#section4" class="text-white hover:text-gray-200 transition duration-200">Contact</a>
           </li>
 
-          <!-- Conditional Rendering for Login/Register or Logout -->
+          <!-- Conditional Rendering for Login/Register or Profile/Logout -->
           <% if (!user) { %>
           <li>
             <a href="/login" class="text-white hover:text-gray-200 transition duration-200">Login</a>
@@ -35,6 +35,9 @@
             <a href="/register" class="text-white hover:text-gray-200 transition duration-200">Register</a>
           </li>
           <% } else { %>
+          <li>
+            <a href="/profile" class="text-white hover:text-gray-200 transition duration-200">Profile</a>
+          </li>
           <li>
             <a href="/logout" class="text-white hover:text-gray-200 transition duration-200">Logout</a>
           </li>
