@@ -6,7 +6,11 @@ import {
 
 import { eq } from "drizzle-orm";
 import { db } from "../config/db.js";
-import { sessionsTable, usersTable } from "../drizzle/schema.js";
+import {
+  sessionsTable,
+  shortLinksTable,
+  usersTable,
+} from "../drizzle/schema.js";
 
 // import bcrypt from "bcrypt";
 import argon2 from "argon2";
@@ -158,4 +162,12 @@ export const authenticateUser = async ({ req, res, user, name, email }) => {
     ...baseConfig,
     maxAge: REFRESH_TOKEN_EXPIRY,
   });
+};
+
+//getAllShortLinks
+export const getAllShortLinks = async (userId) => {
+  return await db
+    .select()
+    .from(shortLinksTable)
+    .where(eq(shortLinksTable.userId, userId));
 };

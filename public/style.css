@@ -579,3 +579,494 @@ footer .social-links a:hover {
     justify-content: flex-end;
   }
 }
+
+/* Profile Page Specific Styles */
+.profile-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+}
+
+.page-title {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #333;
+  font-size: 2rem;
+}
+
+.user-status {
+  margin-bottom: 1.5rem;
+}
+
+.status-badge {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem;
+  border-radius: 5px;
+  font-weight: 500;
+}
+
+.status-badge i {
+  margin-right: 0.5rem;
+  font-size: 1.2rem;
+}
+
+.success {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.warning {
+  background-color: #fff8e1;
+  color: #ff8f00;
+}
+
+.profile-card {
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0px 8px 20px 0px rgba(0, 0, 0, 0.15);
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.profile-name {
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.profile-email {
+  font-size: 1.2rem;
+  color: var(--background);
+}
+
+.profile-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.profile-actions .btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 5px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  text-align: center;
+  flex: 1;
+  min-width: 150px;
+  max-width: 200px;
+  background: #6dabe4;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+.profile-actions .btn:hover {
+  background: #4292dc;
+  box-shadow: 0px 5px 15px 0px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.profile-card {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  padding: 0;
+  overflow: hidden;
+  margin-bottom: 2.5rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.profile-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  padding: 2rem;
+  background: linear-gradient(135deg, #6dabe4 0%, #4292dc 100%);
+  color: white;
+}
+
+.profile-avatar {
+  margin-right: 1.5rem;
+}
+
+.avatar-placeholder {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid rgba(255, 255, 255, 0.5);
+}
+
+.avatar-placeholder span {
+  font-size: 2.5rem;
+  font-weight: 600;
+}
+
+.profile-info {
+  flex: 1;
+}
+
+.profile-name {
+  font-size: 1.8rem;
+  margin: 0 0 0.5rem 0;
+  font-weight: 600;
+  color: white;
+}
+
+.profile-email {
+  font-size: 1.2rem;
+  margin: 0 0 0.5rem 0;
+  opacity: 0.9;
+  display: flex;
+  align-items: center;
+}
+
+.profile-email i,
+.member-since i {
+  margin-right: 0.5rem;
+  font-size: 1.4rem;
+}
+
+.member-since {
+  font-size: 1.2rem;
+  margin: 0;
+  opacity: 0.8;
+  display: flex;
+  align-items: center;
+}
+
+.profile-stats {
+  display: flex;
+  justify-content: space-around;
+  padding: 1.5rem;
+  background-color: #f9f9f9;
+  border-top: 1px solid #eee;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.5rem 1rem;
+}
+
+.stat-label {
+  font-size: 1.2rem;
+  color: #777;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 768px) {
+  .profile-header {
+    flex-direction: column;
+    text-align: center;
+    padding: 1.5rem;
+  }
+
+  .profile-avatar {
+    margin-right: 0;
+    margin-bottom: 1rem;
+  }
+
+  .profile-stats {
+    flex-direction: column;
+    padding: 1rem;
+  }
+
+  .stat-item {
+    margin-bottom: 1rem;
+    padding: 0.5rem 0;
+  }
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 768px) {
+  .profile-card {
+    padding: 1.5rem;
+  }
+
+  .profile-actions {
+    flex-direction: column;
+  }
+
+  .profile-actions .btn {
+    max-width: 100%;
+  }
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.25rem;
+}
+
+.profile-verification {
+  padding: 2rem 1.5rem;
+  border-top: 1px solid #eee;
+}
+
+.verification-status {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 0;
+}
+
+.verification-label {
+  font-weight: 500;
+  color: #555;
+  margin-right: 0.75rem;
+}
+
+.verification-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4rem 0.8rem;
+  border-radius: 50px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-right: 1rem;
+}
+
+.verification-badge i {
+  margin-right: 0.4rem;
+  font-size: 1.1rem;
+}
+
+.verified {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.not-verified {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+.verify-link {
+  display: inline-flex;
+  align-items: center;
+  background-color: #6dabe4;
+  color: white;
+  padding: 0.6rem 1.8rem;
+  border-radius: 50px;
+  text-decoration: none;
+  font-size: 1.2rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.verify-link:hover {
+  background-color: #4292dc;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.verify-link i {
+  margin-right: 0.4rem;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 768px) {
+  .profile-stats {
+    flex-direction: column;
+    padding: 1rem;
+  }
+
+  .stat-item {
+    margin-bottom: 1rem;
+    padding: 0.5rem 0;
+  }
+
+  .verification-status {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .verification-badge {
+    margin: 0.5rem 0;
+  }
+
+  .verify-link {
+    margin-top: 0.5rem;
+  }
+}
+
+/* Container styles */
+.main-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Section title styles */
+.section-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.text-center {
+  text-align: center;
+}
+
+/* Alert styles */
+.alert-container {
+  margin-bottom: 20px;
+}
+
+.alert {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.alert i {
+  margin-right: 10px;
+  font-size: 18px;
+}
+
+.alert-success {
+  background-color: rgba(76, 175, 80, 0.1);
+  color: #4caf50;
+  border: 1px solid #4caf50;
+}
+
+.alert-warning {
+  background-color: rgba(255, 152, 0, 0.1);
+  color: #ff9800;
+  border: 1px solid #ff9800;
+}
+
+/* Card styles */
+.card {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.card-body {
+  padding: 20px;
+}
+
+/* Margin utility */
+.mt-20 {
+  margin-top: 20px;
+}
+
+/* Info text styles */
+.info-text {
+  margin-bottom: 16px;
+  font-size: 16px;
+  color: #333;
+}
+
+/* Form styles */
+.form {
+  width: 100%;
+}
+
+.form-inline {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 15px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.control-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #555;
+}
+
+.form-control {
+  width: 100%;
+  height: 40px;
+  padding: 8px 12px;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.form-control:focus {
+  border-color: #4a90e2;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.25);
+}
+
+/* Button styles */
+.btn {
+  display: inline-block;
+  font-weight: 500;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  user-select: none;
+  border: 1px solid transparent;
+  padding: 10px 16px;
+  font-size: 16px;
+  line-height: 1.5;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn:focus {
+  outline: 0;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+.btn-primary {
+  color: #fff;
+  background-color: #4a90e2;
+  border-color: #4a90e2;
+}
+
+.btn-primary:hover {
+  background-color: #3a80d2;
+  border-color: #3a80d2;
+}
+
+.btn-secondary {
+  color: #fff;
+  background-color: #6c757d;
+  border-color: #6c757d;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268;
+  border-color: #545b62;
+}
+
+/* For Material Design Icons */
+.zmdi {
+  font-family: "Material-Design-Iconic-Font", sans-serif;
+  display: inline-block;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+}

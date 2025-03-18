@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Profile Form</title>
+
+    <!-- Font Icon -->
+    <link
+      rel="stylesheet"
+      href="fonts/material-icon/css/material-design-iconic-font.min.css"
+    />
+
+    <!-- Main css -->
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <%- include('../partials/header') %>
+
+    <main class="container profile-container">
+      <h1 class="page-title">Your Profile</h1>
+
+      <div class="user-status">
+        <% if(user) { %>
+        <div class="status-badge success">
+          <i class="zmdi zmdi-check-circle"></i>
+          <span>You are logged in</span>
+        </div>
+        <% } else { %>
+        <div class="status-badge warning">
+          <i class="zmdi zmdi-alert-circle"></i>
+          <span>You are not logged in</span>
+        </div>
+        <% } %>
+      </div>
+
+      <div class="profile-card">
+        <div class="profile-header">
+          <div class="profile-avatar">
+            <div class="avatar-placeholder">
+              <span><%= user.name.charAt(0).toUpperCase() %></span>
+            </div>
+          </div>
+          <div class="profile-info">
+            <h2 class="profile-name"><%= user.name %></h2>
+            <p class="profile-email">
+              <i class="zmdi zmdi-email"></i> <%= user.email %>
+            </p>
+            <p class="member-since">
+              <i class="zmdi zmdi-calendar"></i> Member since <%= new
+              Date(user.createdAt).toLocaleDateString() %>
+            </p>
+          </div>
+        </div>
+
+        <div class="profile-stats">
+          <div class="stat-item">
+            <span class="stat-value"
+              ><%= user.links ? user.links.length : 0 %></span
+            >
+            <span class="stat-label">Links Created</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value"><%= user.totalClicks || 0 %></span>
+            <span class="stat-label">Total Clicks</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value"
+              ><%= user.lastActive ? new
+              Date(user.lastActive).toLocaleDateString() : 'Today' %></span
+            >
+            <span class="stat-label">Last Active</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="profile-actions">
+        <a href="/edit-profile" class="btn">
+          <i class="zmdi zmdi-edit"></i> Edit Profile
+        </a>
+        <a href="/change-password" class="btn">
+          <i class="zmdi zmdi-key"></i> Change Password
+        </a>
+        <a href="/logout" class="btn">
+          <i class="zmdi zmdi-power"></i> Logout
+        </a>
+      </div>
+    </main>
+
+    <%- include('../partials/footer.ejs') %>
+    <!-- JS -->
+  </body>
+</html>
