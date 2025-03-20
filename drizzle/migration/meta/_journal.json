@@ -8,6 +8,13 @@
       "when": 1741589892989,
       "tag": "0000_pink_lockjaw",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1742363367117,
+      "tag": "0001_dear_riptide",
+      "breakpoints": true
     }
   ]
 }

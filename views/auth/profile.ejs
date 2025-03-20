@@ -73,6 +73,24 @@
             <span class="stat-label">Last Active</span>
           </div>
         </div>
+
+        <div class="profile-verification">
+          <p class="verification-status">
+            <span class="verification-label">Email Verification:</span>
+            <% if (user.isEmailValid) { %>
+            <span class="verification-badge verified">
+              <i class="zmdi zmdi-check-circle"></i> Verified
+            </span>
+            <% } else { %>
+            <span class="verification-badge not-verified">
+              <i class="zmdi zmdi-alert-circle"></i> Not Verified
+            </span>
+            <a href="/resend-verification" class="verify-link">
+              <i class="zmdi zmdi-mail-send"></i> Verify Now
+            </a>
+            <% } %>
+          </p>
+        </div>
       </div>
 
       <div class="profile-actions">
