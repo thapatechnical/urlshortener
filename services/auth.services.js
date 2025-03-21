@@ -4,12 +4,15 @@ import {
   MILLISECONDS_PER_SECOND,
 } from "../config/constants.js";
 
+import crypto from "crypto";
+
 import { eq } from "drizzle-orm";
 import { db } from "../config/db.js";
 import {
   sessionsTable,
   shortLinksTable,
   usersTable,
+  verifyEmailTokensTable,
 } from "../drizzle/schema.js";
 
 // import bcrypt from "bcrypt";
@@ -172,4 +175,28 @@ export const getAllShortLinks = async (userId) => {
     .select()
     .from(shortLinksTable)
     .where(eq(shortLinksTable.userId, userId));
+};
+
+// /generateRandomToken
+export const generateRandomToken = async (digit = 8) => {
+  const min = 10 ** (digit - 1); // 10000000
+  const max = 10 ** digit; // 100000000
+
+  return crypto.randomInt(min, max).toString();
+};
+
+// /insertVerifyEmailToken
+export const insertVerifyEmailToken = async ({ userId, token }) => {
+  await db
+    .delete(verifyEmailTokensTable)
+    .where(lt(verifyEmailTokensTable.expiresAt, sql`CURRENT_TIMESTAMP`));
+
+  await db.insert(verifyEmailTokensTable).values({ userId, token });
+};
+
+//createVerifyEmailLink
+
+export const createVerifyEmailLink = async ({ email, token }) => {
+  const uriEncodedEmail = encodeURIComponent(email);
+  return `${process.env.FRONTEND_URL}/verify-email-token?token=${token}&email=${uriEncodedEmail}`;
 };

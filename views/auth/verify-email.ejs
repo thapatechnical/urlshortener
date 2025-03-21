@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Verify Email</title>
+
+    <!-- Font Icon -->
+    <link
+      rel="stylesheet"
+      href="fonts/material-icon/css/material-design-iconic-font.min.css"
+    />
+
+    <!-- Main css -->
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <%- include('../partials/header') %>
+
+    <main class="container main-container">
+      <h1 class="section-title text-center">Verify Your Email</h1>
+
+      <div class="alert-container">
+        <% if(user) { %>
+        <div class="alert alert-success">
+          <i class="zmdi zmdi-check-circle"></i>
+          <span>You are logged in</span>
+        </div>
+        <% } else { %>
+        <div class="alert alert-warning">
+          <i class="zmdi zmdi-alert-circle"></i>
+          <span>You are not logged in</span>
+        </div>
+        <% } %>
+      </div>
+
+      <div class="card">
+        <div class="card-body">
+          <p class="info-text"><strong>Email:</strong> <%= email %></p>
+          <p class="info-text">
+            Your email has not been verified yet. Please verify your email by
+            entering the 8-digit code or request a new verification link.
+          </p>
+
+          <form
+            action="/resend-verification-link"
+            method="post"
+            class="form-inline"
+          >
+            <button type="submit" class="btn btn-secondary">
+              Resend Verification Link
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <div class="card mt-20">
+        <div class="card-body">
+          <form action="/verify-email-token" method="get" class="form">
+            <div class="form-group">
+              <label for="token" class="control-label"
+                >Enter 8-Digit Verification Code:</label
+              >
+              <input
+                type="text"
+                name="token"
+                id="token"
+                class="form-control"
+                maxlength="8"
+                required
+                pattern="\d{8}"
+                title="Please enter an 8-digit number"
+              />
+            </div>
+
+            <input type="hidden" value="<%= email %>" name="email" />
+
+            <button type="submit" class="btn btn-primary">Verify Code</button>
+          </form>
+        </div>
+      </div>
+    </main>
+    <%- include('../partials/footer.ejs') %>
+    <!-- JS -->
+  </body>
+</html>
