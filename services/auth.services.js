@@ -6,7 +6,7 @@ import {
 
 import crypto from "crypto";
 
-import { eq } from "drizzle-orm";
+import { eq, lt, sql } from "drizzle-orm";
 import { db } from "../config/db.js";
 import {
   sessionsTable,
@@ -178,7 +178,7 @@ export const getAllShortLinks = async (userId) => {
 };
 
 // /generateRandomToken
-export const generateRandomToken = async (digit = 8) => {
+export const generateRandomToken = (digit = 8) => {
   const min = 10 ** (digit - 1); // 10000000
   const max = 10 ** digit; // 100000000
 
@@ -187,16 +187,52 @@ export const generateRandomToken = async (digit = 8) => {
 
 // /insertVerifyEmailToken
 export const insertVerifyEmailToken = async ({ userId, token }) => {
-  await db
-    .delete(verifyEmailTokensTable)
-    .where(lt(verifyEmailTokensTable.expiresAt, sql`CURRENT_TIMESTAMP`));
+  return db.transaction(async (tx) => {
+    try {
+      await tx
+        .delete(verifyEmailTokensTable)
+        .where(lt(verifyEmailTokensTable.expiresAt, sql`CURRENT_TIMESTAMP`));
 
-  await db.insert(verifyEmailTokensTable).values({ userId, token });
+      // Delete any existing tokens for this specific user
+      await tx
+        .delete(verifyEmailTokensTable)
+        .where(eq(verifyEmailTokensTable.userId, userId));
+
+      // Insert the new token
+      await tx.insert(verifyEmailTokensTable).values({ userId, token });
+    } catch (error) {
+      // Log the error but don't expose details to the caller
+      console.error("Failed to insert verification token:", error);
+      throw new Error("Unable to create verification token");
+    }
+  });
 };
 
 //createVerifyEmailLink
+// export const createVerifyEmailLink = async ({ email, token }) => {
+//   const uriEncodedEmail = encodeURIComponent(email);
+//   return `${process.env.FRONTEND_URL}/verify-email-token?token=${token}&email=${uriEncodedEmail}`;
+// };
 
 export const createVerifyEmailLink = async ({ email, token }) => {
-  const uriEncodedEmail = encodeURIComponent(email);
-  return `${process.env.FRONTEND_URL}/verify-email-token?token=${token}&email=${uriEncodedEmail}`;
+  const url = new URL(`${process.env.FRONTEND_URL}/verify-email-token`);
+
+  url.searchParams.append("token", token);
+  url.searchParams.append("email", email);
+
+  return url.toString();
 };
+
+//* The URL API in JavaScript provides an easy way to construct, manipulate, and parse URLs without manual string concatenation. It ensures correct encoding, readability, and security when handling URLs.
+
+//? const url = new URL("https://example.com/profile?id=42&theme=dark");
+
+//! console.log(url.hostname); // "example.com"
+//! console.log(url.pathname); // "/profile"
+//! console.log(url.searchParams.get("id")); // "42"
+//! console.log(url.searchParams.get("theme")); // "dark"
+
+//* 💡 Why Use the URL API?
+//? ✅ Easier URL Construction – No need for manual ? and & handling.
+//? ✅ Automatic Encoding – Prevents issues with special characters.
+//? ✅ Better Readability – Clean and maintainable code.
