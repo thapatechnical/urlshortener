@@ -1,10 +1,11 @@
-import { eq } from "drizzle-orm";
+import { eq, lt, sql } from "drizzle-orm";
 import { db } from "../config/db.js";
-import { sessionsTable, shortLinksTable, usersTable } from "../drizzle/schema.js";
+import { sessionsTable, shortLinksTable, usersTable, verifyEmailTokenTable } from "../drizzle/schema.js";
 import argon2 from "argon2";
 import jwt from "jsonwebtoken";
 import { ACCESS_TOKEN_EXPIRY, MILLISECONDS_PER_SECOND, REFRESH_TOKEN_EXPIRY } from "../config/constants.js";
 import crypto from "crypto";
+
 
 
 export const getUserByEmail = async (email) => {
@@ -177,22 +178,27 @@ export const getAllShortLinks = async (userId) => {
 
 // export const generateRandomToken
 
-export const generateRandomToken = async () => {
-
+export const generateRandomToken =  (digit = 8) => {
   const min = 10 ** (digit - 1);
-  const max = 10 ** digit ;
-
+  const max = 10 ** digit;
   return crypto.randomInt(min, max).toString();
-
-}
+};
 
 // insertVerifyEmailToken
 
 export const insertVerifyEmailToken = async ({ userId, token }) => {
-
- await db.delete(verifyEmailTokenTable).where(eq(verifyEmailTokenTable.userId, userId)); 
+  console.log("token", token);
+  
+  try {
+    await db.delete(verifyEmailTokenTable).where(lt(verifyEmailTokenTable.expiresAt, sql`CURRENT_TIMESTAMP`)); 
 
 return await db.insert(verifyEmailTokenTable).values({ userId, token });
+  } catch (error) {
+    console.log("error", error);
+    
+  }
+
+ 
 
 
 };

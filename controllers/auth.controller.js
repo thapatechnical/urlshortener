@@ -10,12 +10,15 @@ import {
   authenticateUser,
   findUserById,
   getAllShortLinks,
-  generateRandomToken
+  generateRandomToken,
+  insertVerifyEmailToken,
+  createVerifyEmailLink
 } from "../services/auth.services.js";
 import { registerUserSchema, loginUserSchema } from "../validators/auth.validator.js";
 import { ACCESS_TOKEN_EXPIRY, REFRESH_TOKEN_EXPIRY } from "../config/constants.js";
 import { name } from "ejs";
 import { is } from "drizzle-orm";
+import { sendEmail } from "../lib/nodemailer.js";
 
 export const getRegisterPage = (req, res) => {
   if (req.user) return res.redirect("/");
@@ -157,4 +160,13 @@ export const resendVerificationLink = async (req, res) => {
     email: req.user.email,
     token: randomToken,
   });
+
+  sendEmail({
+    to: req.user.email,
+    subject: "Verify your email",
+    html: `
+    <p>Click you can use this token:<code>${randomToken}</code><a href="${verifyEmailLink}">here</a> to verify your email</p>`,
+  }).catch(console.error);
+
+  res.redirect("/verify-email");
 }
