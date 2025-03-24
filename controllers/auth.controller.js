@@ -9,11 +9,13 @@ import {
   refreshTokens,
   authenticateUser,
   findUserById,
-  getAllShortLinks
+  getAllShortLinks,
+  generateRandomToken
 } from "../services/auth.services.js";
 import { registerUserSchema, loginUserSchema } from "../validators/auth.validator.js";
 import { ACCESS_TOKEN_EXPIRY, REFRESH_TOKEN_EXPIRY } from "../config/constants.js";
 import { name } from "ejs";
+import { is } from "drizzle-orm";
 
 export const getRegisterPage = (req, res) => {
   if (req.user) return res.redirect("/");
@@ -113,8 +115,46 @@ export const getProfilePage = async (req, res) => {
         id    : user.id,
         name  : user.name,
         email : user.email,
+        isEmailValid : user.isEmailValid,
         createdAt : user.createdAt,
         links: userShortLinks,
       }
     })
+}
+
+// get verify email page
+
+export const getVerifyEmailPage = async (req, res) => {
+  // if(!req.user || req.user.isEmailValid) return res.redirect("/");
+
+  if(!req.user) return res.redirect("/login");
+
+  const user = await findUserById(req.user.id);
+
+  if(!user || user.isEmailValid) return res.redirect("/");
+
+  return res.render("auth/verify-email",{
+
+    email: req.user.email,
+  });
+}
+
+// resend verification link
+
+export const resendVerificationLink = async (req, res) => {
+
+  if(!req.user) return res.redirect("/");
+
+  const user = await findUserById(req.user.id);
+
+  if(!user || user.isEmailValid) return res.redirect("/");
+
+  const randomToken = generateRandomToken();
+
+  await insertVerifyEmailToken({userId:req.user.id,token:randomToken});
+
+  const verifyEmailLink = await createVerifyEmailLink({
+    email: req.user.email,
+    token: randomToken,
+  });
 }

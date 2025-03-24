@@ -4,6 +4,8 @@ import { sessionsTable, shortLinksTable, usersTable } from "../drizzle/schema.js
 import argon2 from "argon2";
 import jwt from "jsonwebtoken";
 import { ACCESS_TOKEN_EXPIRY, MILLISECONDS_PER_SECOND, REFRESH_TOKEN_EXPIRY } from "../config/constants.js";
+import crypto from "crypto";
+
 
 export const getUserByEmail = async (email) => {
   const [user] = await db
@@ -112,6 +114,7 @@ export const refreshTokens = async (refreshToken) => {
         id: user.id,
         name: user.name,
         email: user.email,
+        isEmailValid: user.isEmailValid,
         sessionId: currentSession.id,
       },
     };
@@ -120,6 +123,8 @@ export const refreshTokens = async (refreshToken) => {
     throw error;
   }
 };
+
+
 
 
 
@@ -134,6 +139,7 @@ export const authenticateUser = async ({req, res, user, name, email}) => {
       id: user.id,
       name: user.name || name,
       email: user.email || email,
+      isEmailValid: false,
       sessionId: session.id,
     });
   
@@ -168,3 +174,35 @@ export const getAllShortLinks = async (userId) => {
     .from(shortLinksTable)
     .where(eq(shortLinksTable.userId, userId));
 };
+
+// export const generateRandomToken
+
+export const generateRandomToken = async () => {
+
+  const min = 10 ** (digit - 1);
+  const max = 10 ** digit ;
+
+  return crypto.randomInt(min, max).toString();
+
+}
+
+// insertVerifyEmailToken
+
+export const insertVerifyEmailToken = async ({ userId, token }) => {
+
+ await db.delete(verifyEmailTokenTable).where(eq(verifyEmailTokenTable.userId, userId)); 
+
+return await db.insert(verifyEmailTokenTable).values({ userId, token });
+
+
+};
+
+// createVerifyEmailLink
+
+export const createVerifyEmailLink = async ({ email, token }) => {
+
+  const uriEncodedToken = encodeURIComponent(token);
+
+  return `${process.env.FRONTEND_URL}/verify-email-token?email=${email}&token=${uriEncodedToken}`;
+ 
+}

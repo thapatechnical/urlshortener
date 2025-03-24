@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Verify Email</title>
+    <!-- Include Tailwind CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-gradient-to-r from-blue-50 to-purple-50 min-h-screen">
+    <%- include('../partials/header') %>
+
+    <main class="container mx-auto px-4 py-12 max-w-2xl">
+      <div class="bg-white rounded-2xl shadow-xl p-8">
+        <h1 class="text-4xl font-bold text-center text-gray-800 mb-6">
+          Verify Your Email
+        </h1>
+
+        <!-- Alert Section -->
+        <div class="mb-8">
+          <% if(user) { %>
+          <div
+            class="bg-green-50 border-l-4 border-green-500 p-4 rounded-lg flex items-center"
+          >
+            <span class="text-green-700">
+              <i class="fas fa-check-circle mr-2"></i> You are logged in
+            </span>
+          </div>
+          <% } else { %>
+          <div
+            class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-lg flex items-center"
+          >
+            <span class="text-yellow-700">
+              <i class="fas fa-exclamation-circle mr-2"></i> You are not logged in
+            </span>
+          </div>
+          <% } %>
+        </div>
+
+        <!-- Email Info Card -->
+        <div class="bg-gradient-to-r from-blue-100 to-purple-100 rounded-xl p-6 mb-8">
+          <p class="text-gray-700 font-semibold mb-2">
+            <span class="text-gray-600">Email:</span> <%= email %>
+          </p>
+          <p class="text-gray-600">
+            Your email has not been verified yet. Please verify your email by
+            entering the 8-digit code or request a new verification link.
+          </p>
+        </div>
+
+        <!-- Resend Verification Link Button -->
+        <form action="/resend-verification-link" method="post" class="mb-8">
+          <button
+            type="submit"
+            class="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold py-3 px-6 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-300"
+          >
+            Resend Verification Link
+          </button>
+        </form>
+
+        <!-- Verification Code Form -->
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <form action="/verify-email-token" method="get">
+            <div class="mb-6">
+              <label for="token" class="block text-gray-700 font-semibold mb-2">
+                Enter 8-Digit Verification Code:
+              </label>
+              <input
+                type="text"
+                name="token"
+                id="token"
+                class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                maxlength="8"
+                required
+                pattern="\d{8}"
+                title="Please enter an 8-digit number"
+                placeholder="12345678"
+              />
+            </div>
+
+            <input type="hidden" value="<%= email %>" name="email" />
+
+            <button
+              type="submit"
+              class="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold py-3 px-6 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-300"
+            >
+              Verify Code
+            </button>
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <%- include('../partials/footer.ejs') %>
+
+    <!-- Font Awesome for Icons -->
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"
+      integrity="sha512-fzff82+8pzHnwA1mF6z8e6Z8r0p6Z8e6Z8r0p6Z8e6Z8r0p6Z8e6Z8r0p6Z8e6Z8r0p6Z8e6Z8r0p6Z8e6Z8r0"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+  </body>
+</html>

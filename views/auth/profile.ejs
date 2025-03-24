@@ -5,34 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Profile Form</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css" rel="stylesheet">
 </head>
-<body class="bg-gray-100">
+<body class="bg-gradient-to-r from-blue-50 to-purple-50 min-h-screen">
     <%- include('../partials/header') %>
     
-    <main class="container mx-auto p-6">
-        <h1 class="text-3xl font-bold text-center mb-6">Your Profile</h1>
+    <main class="container mx-auto p-6 max-w-4xl">
+        <h1 class="text-4xl font-bold text-center text-gray-800 mb-8">Your Profile</h1>
         
-        <div class="flex justify-center mb-6">
+        <!-- Login Status Alert -->
+        <div class="flex justify-center mb-8">
             <% if(user) { %>
-            <div class="flex items-center bg-green-500 text-white px-4 py-2 rounded shadow">
+            <div class="flex items-center bg-green-500 text-white px-6 py-3 rounded-lg shadow-md">
                 <i class="zmdi zmdi-check-circle mr-2"></i>
                 <span>You are logged in</span>
             </div>
             <% } else { %>
-            <div class="flex items-center bg-yellow-500 text-white px-4 py-2 rounded shadow">
+            <div class="flex items-center bg-yellow-500 text-white px-6 py-3 rounded-lg shadow-md">
                 <i class="zmdi zmdi-alert-circle mr-2"></i>
                 <span>You are not logged in</span>
             </div>
             <% } %>
         </div>
 
-        <div class="bg-white p-6 rounded-lg shadow-md max-w-lg mx-auto">
-            <div class="flex items-center space-x-4">
-                <div class="w-16 h-16 flex items-center justify-center bg-blue-500 text-white text-2xl font-bold rounded-full">
+        <!-- Profile Card -->
+        <div class="bg-white p-8 rounded-2xl shadow-xl">
+            <!-- User Info Section -->
+            <div class="flex items-center space-x-6">
+                <div class="w-20 h-20 flex items-center justify-center bg-gradient-to-r from-blue-500 to-purple-600 text-white text-4xl font-bold rounded-full">
                     <%= user.name.charAt(0).toUpperCase() %>
                 </div>
                 <div>
-                    <h2 class="text-xl font-semibold"><%= user.name %></h2>
+                    <h2 class="text-2xl font-bold text-gray-800"><%= user.name %></h2>
                     <p class="text-gray-600 flex items-center">
                         <i class="zmdi zmdi-email mr-2"></i> <%= user.email %>
                     </p>
@@ -42,33 +46,54 @@
                 </div>
             </div>
 
-            <div class="mt-6 grid grid-cols-3 gap-4 text-center">
-                <div class="bg-gray-200 p-4 rounded">
-                    <span class="block text-xl font-bold"><%= user.links ? user.links.length : 0 %></span>
+            <!-- Stats Section -->
+            <div class="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-6">
+                <div class="bg-gradient-to-r from-blue-100 to-purple-100 p-6 rounded-xl text-center">
+                    <span class="block text-3xl font-bold text-gray-800"><%= user.links ? user.links.length : 0 %></span>
                     <span class="text-gray-600">Links Created</span>
                 </div>
-                <div class="bg-gray-200 p-4 rounded">
-                    <span class="block text-xl font-bold"><%= user.totalClicks || 0 %></span>
+                <div class="bg-gradient-to-r from-blue-100 to-purple-100 p-6 rounded-xl text-center">
+                    <span class="block text-3xl font-bold text-gray-800"><%= user.totalClicks || 0 %></span>
                     <span class="text-gray-600">Total Clicks</span>
                 </div>
-                <div class="bg-gray-200 p-4 rounded">
-                    <span class="block text-xl font-bold">
+                <div class="bg-gradient-to-r from-blue-100 to-purple-100 p-6 rounded-xl text-center">
+                    <span class="block text-3xl font-bold text-gray-800">
                         <%= user.lastActive ? new Date(user.lastActive).toLocaleDateString() : 'Today' %>
                     </span>
                     <span class="text-gray-600">Last Active</span>
                 </div>
             </div>
+
+            <!-- Email Verification Section -->
+            <div class="mt-8">
+                <p class="text-lg font-semibold text-gray-800 mb-4">Email Verification:</p>
+                <% if (user.isEmailValid) { %>
+                <div class="flex items-center bg-green-100 p-4 rounded-lg">
+                    <i class="zmdi zmdi-check-circle text-green-500 mr-2"></i>
+                    <span class="text-green-700">Your email is verified</span>
+                </div>
+                <% } else { %>
+                <div class="flex items-center bg-yellow-100 p-4 rounded-lg">
+                    <i class="zmdi zmdi-alert-circle text-yellow-500 mr-2"></i>
+                    <span class="text-yellow-700">Your email is not verified</span>
+                    <a href="/verify-email" class="ml-auto text-blue-500 hover:text-blue-700 flex items-center">
+                        <i class="zmdi zmdi-mail-send mr-2"></i> Verify Now
+                    </a>
+                </div>
+                <% } %>
+            </div>
         </div>
 
-        <div class="flex justify-center space-x-4 mt-6">
-            <a href="/edit-profile" class="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600">
-                <i class="zmdi zmdi-edit"></i> Edit Profile
+        <!-- Action Buttons -->
+        <div class="flex justify-center space-x-6 mt-8">
+            <a href="/edit-profile" class="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-lg shadow-md hover:from-blue-600 hover:to-purple-700 transition-all duration-300 flex items-center">
+                <i class="zmdi zmdi-edit mr-2"></i> Edit Profile
             </a>
-            <a href="/change-password" class="bg-gray-500 text-white px-4 py-2 rounded shadow hover:bg-gray-600">
-                <i class="zmdi zmdi-key"></i> Change Password
+            <a href="/change-password" class="bg-gradient-to-r from-gray-500 to-gray-600 text-white px-6 py-3 rounded-lg shadow-md hover:from-gray-600 hover:to-gray-700 transition-all duration-300 flex items-center">
+                <i class="zmdi zmdi-key mr-2"></i> Change Password
             </a>
-            <a href="/logout" class="bg-red-500 text-white px-4 py-2 rounded shadow hover:bg-red-600">
-                <i class="zmdi zmdi-power"></i> Logout
+            <a href="/logout" class="bg-gradient-to-r from-red-500 to-red-600 text-white px-6 py-3 rounded-lg shadow-md hover:from-red-600 hover:to-red-700 transition-all duration-300 flex items-center">
+                <i class="zmdi zmdi-power mr-2"></i> Logout
             </a>
         </div>
     </main>
