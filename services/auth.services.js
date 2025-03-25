@@ -6,7 +6,7 @@ import {
 
 import crypto from "crypto";
 
-import { eq, lt, sql } from "drizzle-orm";
+import { and, eq, gte, lt, sql } from "drizzle-orm";
 import { db } from "../config/db.js";
 import {
   sessionsTable,
@@ -18,6 +18,11 @@ import {
 // import bcrypt from "bcrypt";
 import argon2 from "argon2";
 import jwt from "jsonwebtoken";
+import { sendEmail } from "../lib/nodemailer.js";
+import path from "path";
+import fs from "fs/promises";
+import mjml2html from "mjml";
+import ejs from "ejs";
 
 export const getUserByEmail = async (email) => {
   const [user] = await db
@@ -236,3 +241,124 @@ export const createVerifyEmailLink = async ({ email, token }) => {
 //? ✅ Easier URL Construction – No need for manual ? and & handling.
 //? ✅ Automatic Encoding – Prevents issues with special characters.
 //? ✅ Better Readability – Clean and maintainable code.
+
+// /findVerificationEmailToken
+
+// export const findVerificationEmailToken = async ({ token, email }) => {
+//   const tokenData = await db
+//     // .select({ key: table.column })
+//     .select({
+//       userId: verifyEmailTokensTable.userId,
+//       token: verifyEmailTokensTable.token,
+//       expiresAt: verifyEmailTokensTable.expiresAt,
+//     })
+//     .from(verifyEmailTokensTable)
+//     .where(
+//       and(
+//         eq(verifyEmailTokensTable.token, token),
+//         gte(verifyEmailTokensTable.expiresAt, sql`CURRENT_TIMESTAMP`)
+//       )
+//     );
+
+//   // If no token found, return null
+//   if (!tokenData.length) {
+//     return null;
+//   }
+
+//   const { userId } = tokenData[0];
+//   // const userId = tokenData[0].userId;
+
+//   const userData = await db
+//     .select({
+//       userId: usersTable.id,
+//       email: usersTable.email,
+//     })
+//     .from(usersTable)
+//     .where(eq(usersTable.id, userId));
+
+//   // If user not found, return null
+//   if (!userData.length) {
+//     return null;
+//   }
+
+//   return {
+//     userId: userData[0].userId,
+//     email: userData[0].email,
+//     token: tokenData[0].token,
+//     expiresAt: tokenData[0].expiresAt,
+//   };
+// };
+
+export const findVerificationEmailToken = async ({ token, email }) => {
+  return await db
+    .select({
+      userId: usersTable.id,
+      email: usersTable.email,
+      token: verifyEmailTokensTable.token,
+      expiresAt: verifyEmailTokensTable.expiresAt,
+    })
+    .from(verifyEmailTokensTable)
+    .where(
+      and(
+        eq(verifyEmailTokensTable.token, token),
+        eq(usersTable.email, email),
+        gte(verifyEmailTokensTable.expiresAt, sql`CURRENT_TIMESTAMP`)
+      )
+    )
+    .innerJoin(usersTable, eq(verifyEmailTokensTable.userId, usersTable.id));
+};
+
+// /verifyUserEmailAndUpdate
+export const verifyUserEmailAndUpdate = async (email) => {
+  return db
+    .update(usersTable)
+    .set({ isEmailValid: true })
+    .where(eq(usersTable.email, email));
+};
+
+//clearVerifyEmailTokens
+
+export const clearVerifyEmailTokens = async (userId) => {
+  // const [user] = await db
+  //   .select()
+  //   .from(usersTable)
+  //   .where(eq(usersTable.email, email));
+
+  return await db
+    .delete(verifyEmailTokensTable)
+    .where(eq(verifyEmailTokensTable.userId, userId));
+};
+
+//
+
+export const sendNewVerifyEmailLink = async ({ userId, email }) => {
+  const randomToken = generateRandomToken();
+
+  await insertVerifyEmailToken({ userId, token: randomToken });
+
+  const verifyEmailLink = await createVerifyEmailLink({
+    email,
+    token: randomToken,
+  });
+
+  // 1: to get the file data
+  const mjmlTemplate = await fs.readFile(
+    path.join(import.meta.dirname, "..", "emails", "verify-email.mjml"),
+    "utf-8"
+  );
+
+  // to replace the placeholders with the actual values
+  const filledTemplate = ejs.render(mjmlTemplate, {
+    code: randomToken,
+    link: verifyEmailLink,
+  });
+
+  // to convert mjml to html
+  const htmlOutput = mjml2html(filledTemplate).html;
+
+  sendEmail({
+    to: email,
+    subject: "Verify your email",
+    html: htmlOutput,
+  }).catch(console.error);
+};

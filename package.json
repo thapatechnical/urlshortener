@@ -25,9 +25,11 @@
     "express": "^5.0.1",
     "express-session": "^1.18.1",
     "jsonwebtoken": "^9.0.2",
+    "mjml": "^4.15.3",
     "mysql2": "^3.12.0",
     "nodemailer": "^6.10.0",
     "request-ip": "^3.3.0",
+    "resend": "^4.1.2",
     "zod": "^3.24.2"
   },
   "devDependencies": {
