@@ -366,3 +366,21 @@ export const sendNewVerifyEmailLink = async ({ userId, email }) => {
     html: htmlOutput,
   }).catch(console.error);
 };
+
+// /updateUserByName
+export const updateUserByName = async ({ userId, name }) => {
+  return await db
+    .update(usersTable)
+    .set({ name: name })
+    .where(eq(usersTable.id, userId));
+};
+
+//updateUserPassword
+export const updateUserPassword = async ({ userId, newPassword }) => {
+  const newHashPassword = await hashPassword(newPassword);
+
+  return await db
+    .update(usersTable)
+    .set({ password: newHashPassword })
+    .where(eq(usersTable.id, userId));
+};

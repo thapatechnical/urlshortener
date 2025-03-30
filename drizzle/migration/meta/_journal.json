@@ -8,6 +8,13 @@
       "when": 1742452787718,
       "tag": "0000_luxuriant_sharon_carter",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1743232719520,
+      "tag": "0001_daily_nova",
+      "breakpoints": true
     }
   ]
 }

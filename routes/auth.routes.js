@@ -29,6 +29,18 @@ router
 
 router.route("/verify-email-token").get(authControllers.verifyEmailToken);
 
+router
+  .route("/edit-profile")
+  .get(authControllers.getEditProfilePage)
+  .post(authControllers.postEditProfile);
+
+router
+  .route("/change-password")
+  .get(authControllers.getChangePasswordPage)
+  .post(authControllers.postChangePassword);
+
+router.route("/reset-password").get(authControllers.getResetPasswordPage);
+
 router.route("/logout").get(authControllers.logoutUser);
 
 export const authRoutes = router;

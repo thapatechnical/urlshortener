@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/style.css" />
+    <!-- ZMDI Material Design Iconic Font CDN -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/material-design-iconic-font@2.2.0/dist/css/material-design-iconic-font.min.css"
+    />
+    <title>Edit Profile</title>
+  </head>
+
+  <body>
+    <%- include('../partials/header.ejs') %>
+
+    <div class="main">
+      <section class="url-shortener">
+        <div class="container">
+          <div class="shortener-content">
+            <div class="user-status">
+              <% if(user) { %>
+              <div class="status-badge success">
+                <i class="zmdi zmdi-check-circle"></i>
+                <span>You are logged in</span>
+              </div>
+              <% } else { %>
+              <div class="status-badge warning">
+                <i class="zmdi zmdi-alert-circle"></i>
+                <span>You are not logged in</span>
+              </div>
+              <% } %>
+            </div>
+
+            <div class="shortener-form">
+              <h1 class="form-title">Edit Your Profile</h1>
+              <form
+                action="/edit-profile"
+                method="post"
+                class="url-form"
+                id="url-form"
+              >
+                <div class="form-group">
+                  <label for="name">
+                    <i class="zmdi zmdi-account"></i>
+                  </label>
+                  <input
+                    type="text"
+                    name="name"
+                    id="name"
+                    value="<%= username  %>"
+                    required
+                  />
+                </div>
+
+                <% if ((errors && errors.length > 0)) { %> <%
+                errors.forEach((error) => { %>
+                <p class="flash-error"><%= error %></p>
+                <% }); %> <% } %>
+
+                <div class="form-group form-button">
+                  <input
+                    type="submit"
+                    name="shorten"
+                    id="shorten"
+                    class="form-submit"
+                    value="Save Changes"
+                  />
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <%- include('../partials/footer.ejs') %>
+  </body>
+</html>

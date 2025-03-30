@@ -1,9 +1,4 @@
 import {
-  ACCESS_TOKEN_EXPIRY,
-  REFRESH_TOKEN_EXPIRY,
-} from "../config/constants.js";
-import { sendEmail } from "../lib/nodemailer.js";
-import {
   authenticateUser,
   clearUserSession,
   clearVerifyEmailTokens,
@@ -22,12 +17,17 @@ import {
   hashPassword,
   insertVerifyEmailToken,
   sendNewVerifyEmailLink,
+  updateUserByName,
+  updateUserPassword,
   verifyUserEmailAndUpdate,
 } from "../services/auth.services.js";
 import {
+  forgotPasswordSchema,
   loginUserSchema,
   registerUserSchema,
   verifyEmailSchema,
+  verifyPasswordSchema,
+  verifyUserSchema,
 } from "../validators/auth-validator.js";
 
 export const getRegisterPage = (req, res) => {
@@ -214,4 +214,79 @@ export const verifyEmailToken = async (req, res) => {
   clearVerifyEmailTokens(token.userId).catch(console.error);
 
   return res.redirect("/profile");
+};
+
+//getEditProfilePage
+export const getEditProfilePage = async (req, res) => {
+  if (!req.user) return res.redirect("/");
+
+  const user = await findUserById(req.user.id);
+  if (!user) return res.status(404).send("User not found");
+
+  return res.render("auth/edit-profile", {
+    username: user.name,
+    errors: req.flash("errors"),
+  });
+};
+
+//postEditProfile
+export const postEditProfile = async (req, res) => {
+  if (!req.user) return res.redirect("/");
+
+  const { data, error } = verifyUserSchema.safeParse(req.body);
+  if (error) {
+    const errorMessage = error.errors[0].message;
+    req.flash("errors", errorMessage);
+    return res.redirect("/");
+  }
+  await updateUserByName({ userId: req.user.id, name: data.name });
+
+  return res.redirect("/profile");
+};
+
+//getChangePasswordPage
+export const getChangePasswordPage = async (req, res) => {
+  if (!req.user) return res.redirect("/");
+  return res.render("auth/change-password", {
+    errors: req.flash("errors"),
+  });
+};
+
+//postChangePassword
+export const postChangePassword = async (req, res) => {
+  if (!req.user) return res.redirect("/");
+
+  const { data, error } = verifyPasswordSchema.safeParse(req.body);
+  if (error) {
+    const errorMessage = error.errors[0].message;
+    req.flash("errors", errorMessage);
+    return res.redirect("/change-password");
+  }
+
+  const { currentPassword, newPassword } = data;
+
+  const user = await findUserById(req.user.id);
+  if (!user) {
+    req.flash("errors", "Invalid password");
+    return res.redirect("/change-password");
+  }
+
+  const isPasswordValid = comparePassword(currentPassword, user.password);
+  if (!isPasswordValid) {
+    req.flash("errors", "Current Password that you entered is invalid");
+    return res.redirect("auth/change-password");
+  }
+
+  await updateUserPassword({ userId: user.id, newPassword });
+
+  return res.redirect("/profile");
+};
+
+// /getResetPasswordPage
+
+export const getResetPasswordPage = async (req, res) => {
+  return res.render("auth/forgot-password", {
+    formSubmitted: req.flash("formSubmitted")[0],
+    errors: req.flash("errors"),
+  });
 };

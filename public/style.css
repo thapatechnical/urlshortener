@@ -264,6 +264,9 @@ footer .social-links a:hover {
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: var(--shadow-sm);
+  width: 100%;
+  display: flex;
+  justify-content: center;
 }
 
 .form-submit:hover {
@@ -1069,4 +1072,117 @@ footer .social-links a:hover {
   font-variant: normal;
   text-transform: none;
   line-height: 1;
+}
+
+/* // style for the change password part  */
+/* Change Password Specific Styles */
+.change-password-content {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  max-width: 500px;
+  margin: 0 auto;
+  padding: var(--spacing-5);
+}
+
+.change-password-form {
+  width: 100%;
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-wrapper .prefix-icon {
+  position: absolute;
+  left: 1rem;
+  color: var(--muted);
+  z-index: 10;
+}
+
+.input-wrapper input {
+  padding-left: 3.5rem;
+  padding-right: 3.5rem;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 1rem;
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  z-index: 10;
+  transition: color 0.2s ease;
+}
+
+.toggle-password:hover {
+  color: var(--accent);
+}
+
+.password-requirements {
+  margin-top: var(--spacing-2);
+  background-color: rgba(37, 99, 235, 0.05);
+  border-radius: var(--radius-sm);
+  padding: var(--spacing-2);
+}
+
+.password-requirements ul {
+  padding-left: var(--spacing-4);
+  margin: 0;
+  color: var(--muted);
+  font-size: 1.4rem;
+}
+
+.password-requirements ul li {
+  margin-bottom: var(--spacing-1);
+}
+
+.error-container {
+  margin-bottom: var(--spacing-4);
+}
+
+@media screen and (max-width: 48rem) {
+  .change-password-content {
+    padding: var(--spacing-4);
+  }
+}
+
+/* forgot-password  */
+.forgot-password {
+  height: 80vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+/* Forgot Password Button Styles */
+.forgot-password-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: var(--spacing-4);
+}
+
+.forgot-password-btn {
+  display: inline-flex;
+  align-items: center;
+  font-size: 1.4rem;
+  color: var(--muted);
+  background-color: transparent;
+  padding: var(--spacing-1) var(--spacing-2);
+  border-radius: var(--radius-md);
+  transition: all 0.2s ease;
+}
+
+.forgot-password-btn i {
+  margin-right: var(--spacing-1);
+  font-size: 1.6rem;
+}
+
+.forgot-password-btn:hover {
+  color: var(--accent);
+  background-color: rgba(37, 99, 235, 0.05);
 }
