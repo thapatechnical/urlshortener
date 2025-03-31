@@ -1,17 +1,23 @@
+import { getHtmlFromMjmlTemplate } from "../lib/get-html-from-mjml-template.js";
+import { sendEmail } from "../lib/send-email.js";
 import {
   authenticateUser,
+  clearResetPasswordToken,
   clearUserSession,
   clearVerifyEmailTokens,
   comparePassword,
   createAccessToken,
   createRefreshToken,
+  createResetPasswordLink,
   createSession,
   createUser,
   createVerifyEmailLink,
+  findUserByEmail,
   findUserById,
   findVerificationEmailToken,
   generateRandomToken,
   getAllShortLinks,
+  getResetPasswordToken,
   // generateToken,
   getUserByEmail,
   hashPassword,
@@ -27,6 +33,7 @@ import {
   registerUserSchema,
   verifyEmailSchema,
   verifyPasswordSchema,
+  verifyResetPasswordSchema,
   verifyUserSchema,
 } from "../validators/auth-validator.js";
 
@@ -289,4 +296,86 @@ export const getResetPasswordPage = async (req, res) => {
     formSubmitted: req.flash("formSubmitted")[0],
     errors: req.flash("errors"),
   });
+};
+
+//postForgotPassword
+export const postForgotPassword = async (req, res) => {
+  const { data, error } = forgotPasswordSchema.safeParse(req.body);
+
+  if (error) {
+    const errorMessages = error.errors.map((err) => err.message);
+    req.flash("errors", errorMessages[0]);
+    return res.redirect("/reset-password");
+  }
+
+  const user = await findUserByEmail(data.email);
+
+  if (user) {
+    const resetPasswordLink = await createResetPasswordLink({
+      userId: user.id,
+    });
+
+    const html = await getHtmlFromMjmlTemplate("reset-password-email", {
+      name: user.name,
+      link: resetPasswordLink,
+    });
+
+    sendEmail({
+      to: user.email,
+      subject: "Reset Your Password",
+      html,
+    });
+  }
+
+  req.flash("formSubmitted", true);
+  return res.redirect("/reset-password");
+};
+
+//getResetPasswordTokenPage
+export const getResetPasswordTokenPage = async (req, res) => {
+  const { token } = req.params;
+  const passwordResetData = await getResetPasswordToken(token);
+  if (!passwordResetData) return res.render("auth/wrong-reset-password-token");
+
+  return res.render("auth/reset-password", {
+    formSubmitted: req.flash("formSubmitted")[0],
+    errors: req.flash("errors"),
+    token,
+  });
+};
+
+//! Extract password reset token from request parameters.
+//! Validate token authenticity, expiration, and match with a previously issued token.
+//! If valid, get new password from request body and validate using a schema (e.g., Zod) for complexity.
+//! Identify user ID linked to the token.
+//! Invalidate all existing reset tokens for that user ID.
+//! Hash the new password with a secure algorithm .
+//! Update the user's password in the database with the hashed version.
+//! Redirect to login page or return a success response.
+
+//postResetPasswordToken
+export const postResetPasswordToken = async (req, res) => {
+  const { token } = req.params;
+  const passwordResetData = await getResetPasswordToken(token);
+  if (!passwordResetData) {
+    req.flash("errors", "Password Token is not matching");
+    return res.render("auth/wrong-reset-password-token");
+  }
+
+  const { data, error } = verifyResetPasswordSchema.safeParse(req.body);
+  if (error) {
+    const errorMessages = error.errors.map((err) => err.message);
+    req.flash("errors", errorMessages[0]);
+    res.redirect(`/reset-password/${token}`);
+  }
+
+  const { newPassword } = data;
+
+  const user = await findUserById(passwordResetData.userId);
+
+  await clearResetPasswordToken(user.id);
+
+  await updateUserPassword({ userId: user.id, newPassword });
+
+  return res.redirect("/login");
 };
