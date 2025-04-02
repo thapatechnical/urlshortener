@@ -231,7 +231,7 @@ export const getEditProfilePage = async (req, res) => {
   if (!user) return res.status(404).send("User not found");
 
   return res.render("auth/edit-profile", {
-    username: user.name,
+    name: user.name,
     errors: req.flash("errors"),
   });
 };
@@ -240,48 +240,48 @@ export const getEditProfilePage = async (req, res) => {
 export const postEditProfile = async (req, res) => {
   if (!req.user) return res.redirect("/");
 
+  // const user = req.body;
   const { data, error } = verifyUserSchema.safeParse(req.body);
   if (error) {
-    const errorMessage = error.errors[0].message;
-    req.flash("errors", errorMessage);
-    return res.redirect("/");
+    const errorMessages = error.errors.map((err) => err.message);
+    req.flash("errors", errorMessages);
+    return res.redirect("/edit-profile");
   }
+
   await updateUserByName({ userId: req.user.id, name: data.name });
 
   return res.redirect("/profile");
 };
 
 //getChangePasswordPage
+
 export const getChangePasswordPage = async (req, res) => {
   if (!req.user) return res.redirect("/");
+
   return res.render("auth/change-password", {
     errors: req.flash("errors"),
   });
 };
 
 //postChangePassword
-export const postChangePassword = async (req, res) => {
-  if (!req.user) return res.redirect("/");
 
+export const postChangePassword = async (req, res) => {
   const { data, error } = verifyPasswordSchema.safeParse(req.body);
   if (error) {
-    const errorMessage = error.errors[0].message;
-    req.flash("errors", errorMessage);
+    const errorMessages = error.errors.map((err) => err.message);
+    req.flash("errors", errorMessages);
     return res.redirect("/change-password");
   }
 
   const { currentPassword, newPassword } = data;
 
   const user = await findUserById(req.user.id);
-  if (!user) {
-    req.flash("errors", "Invalid password");
-    return res.redirect("/change-password");
-  }
+  if (!user) return res.status(404).send("User not found");
 
   const isPasswordValid = comparePassword(currentPassword, user.password);
   if (!isPasswordValid) {
     req.flash("errors", "Current Password that you entered is invalid");
-    return res.redirect("auth/change-password");
+    return res.redirect("/change-password");
   }
 
   await updateUserPassword({ userId: user.id, newPassword });
