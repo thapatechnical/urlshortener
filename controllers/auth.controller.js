@@ -278,7 +278,7 @@ export const postChangePassword = async (req, res) => {
   const user = await findUserById(req.user.id);
   if (!user) return res.status(404).send("User not found");
 
-  const isPasswordValid = comparePassword(currentPassword, user.password);
+  const isPasswordValid = await comparePassword(currentPassword, user.password);
   if (!isPasswordValid) {
     req.flash("errors", "Current Password that you entered is invalid");
     return res.redirect("/change-password");
