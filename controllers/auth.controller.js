@@ -12,9 +12,13 @@ import {
   getAllShortLinks,
   generateRandomToken,
   insertVerifyEmailToken,
-  createVerifyEmailLink
+  createVerifyEmailLink,
+  verifyUserEmailAndUpdate,
+  findVerificationEmailToken,
+  clearVerifyEmailToken,
+  sendNewVerifyEmailLink,
 } from "../services/auth.services.js";
-import { registerUserSchema, loginUserSchema } from "../validators/auth.validator.js";
+import { registerUserSchema, loginUserSchema, verifyEmailSchema } from "../validators/auth.validator.js";
 import { ACCESS_TOKEN_EXPIRY, REFRESH_TOKEN_EXPIRY } from "../config/constants.js";
 import { name } from "ejs";
 import { is } from "drizzle-orm";
@@ -152,21 +156,34 @@ export const resendVerificationLink = async (req, res) => {
 
   if(!user || user.isEmailValid) return res.redirect("/");
 
-  const randomToken = generateRandomToken();
-
-  await insertVerifyEmailToken({userId:req.user.id,token:randomToken});
-
-  const verifyEmailLink = await createVerifyEmailLink({
-    email: req.user.email,
-    token: randomToken,
-  });
-
-  sendEmail({
-    to: req.user.email,
-    subject: "Verify your email",
-    html: `
-    <p>Click you can use this token:<code>${randomToken}</code><a href="${verifyEmailLink}">here</a> to verify your email</p>`,
-  }).catch(console.error);
+  await sendNewVerifyEmailLink({email: user.email, userId: user.id});
 
   res.redirect("/verify-email");
 }
+
+// verifyEmailToken 
+
+export const verifyEmailToken = async (req, res) => {
+  const { data, error } = verifyEmailSchema.safeParse(req.query); // Note: changed from req.body to req.query
+  
+  if (error) {
+    return res.send("Verification link invalid - schema validation failed");
+  }
+
+  const token = await findVerificationEmailToken(data);
+  
+  if (!token) {
+    return res.send("Verification link invalid - token not found or expired");
+  }
+
+  await verifyUserEmailAndUpdate(token.userId);
+  
+  await clearVerifyEmailToken(token.email);
+
+  // Refresh user session if they're logged in
+  if (req.user && req.user.id === token.userId) {
+    // You might want to regenerate the tokens here
+  }
+
+  return res.redirect("/profile");
+};
