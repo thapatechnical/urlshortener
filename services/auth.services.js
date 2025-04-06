@@ -5,11 +5,12 @@ import argon2 from "argon2";
 import jwt from "jsonwebtoken";
 import { ACCESS_TOKEN_EXPIRY, MILLISECONDS_PER_SECOND, REFRESH_TOKEN_EXPIRY } from "../config/constants.js";
 import crypto from "crypto";
-import { sendEmail } from "../lib/nodemailer.js";
 import fs from "fs/promises";
 import path from "path";
 import ejs from "ejs";
 import mjml2html from "mjml";
+// import { sendEmail } from "../lib/nodemailer.js";
+import { sendEmail } from "../lib/send-email.js";
 
 
 export const getUserByEmail = async (email) => {
