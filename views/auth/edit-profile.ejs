@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edit Profile</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css" rel="stylesheet">
+</head>
+<body class="bg-gradient-to-r from-blue-50 to-purple-50 min-h-screen">
+    <%- include('../partials/header') %>
+    
+    <main class="container mx-auto p-6 max-w-4xl">
+        <h1 class="text-4xl font-bold text-center text-gray-800 mb-8">Edit Profile</h1>
+        
+        <!-- Profile Edit Form -->
+        <div class="bg-white p-8 rounded-2xl shadow-xl">
+            <form action="/edit-profile" method="POST">
+                <!-- User Info Section -->
+                <div class="flex items-center space-x-6 mb-8">
+                    <div class="w-20 h-20 flex items-center justify-center bg-gradient-to-r from-blue-500 to-purple-600 text-white text-4xl font-bold rounded-full">
+                        <%= user.name.charAt(0).toUpperCase() %>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-800">Profile Information</h2>
+                        <p class="text-gray-600">Update your personal details</p>
+                    </div>
+                </div>
+
+                <!-- Form Fields -->
+                <div class="space-y-6">
+                    <!-- Name Field -->
+                    <div class="form-group">
+                        <label for="name" class="block text-gray-700 font-medium mb-2">Full Name</label>
+                        <input type="text" id="name" name="name" value="<%= name %>" 
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+
+                    <!-- Email Field -->
+                    <div class="form-group">
+                        <label for="email" class="block text-gray-700 font-medium mb-2">Email Address</label>
+                        <input type="email" id="email" name="email" value="<%= email %>" 
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+
+                    <!-- Bio Field -->
+                    <div class="form-group">
+                        <label for="bio" class="block text-gray-700 font-medium mb-2">Bio</label>
+                        <textarea id="bio" name="bio" rows="3" 
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"><%= user.bio || '' %></textarea>
+                    </div>
+
+                    <!-- Profile Picture Upload -->
+                    <div class="form-group">
+                        <label class="block text-gray-700 font-medium mb-2">Profile Picture</label>
+                        <div class="flex items-center space-x-4">
+                            <div class="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+                                <% if(user.profilePicture) { %>
+                                    <img src="<%= user.profilePicture %>" alt="Profile" class="w-full h-full object-cover">
+                                <% } else { %>
+                                    <i class="zmdi zmdi-account text-3xl text-gray-400"></i>
+                                <% } %>
+                            </div>
+                            <div>
+                                <input type="file" id="profilePicture" name="profilePicture" accept="image/*" class="hidden">
+                                <label for="profilePicture" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg cursor-pointer hover:bg-gray-200 transition">
+                                    Change Photo
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="flex justify-end space-x-4 mt-8">
+                    <a href="/profile" class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
+                        Cancel
+                    </a>
+                    <button  type="submit" value="Save Changes" class="px-6 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg shadow-md hover:from-blue-600 hover:to-purple-700 transition-all duration-300">
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <%- include('../partials/footer.ejs') %>
+</body>
+</html>

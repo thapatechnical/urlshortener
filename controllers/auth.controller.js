@@ -21,8 +21,10 @@ import {
 import { registerUserSchema, loginUserSchema, verifyEmailSchema } from "../validators/auth.validator.js";
 import { ACCESS_TOKEN_EXPIRY, REFRESH_TOKEN_EXPIRY } from "../config/constants.js";
 import { name } from "ejs";
-import { is } from "drizzle-orm";
+import { eq, is } from "drizzle-orm";
 import { sendEmail } from "../lib/nodemailer.js";
+import { db } from "../config/db.js";
+import { usersTable } from "../drizzle/schema.js";
 
 export const getRegisterPage = (req, res) => {
   if (req.user) return res.redirect("/");
@@ -105,6 +107,46 @@ export const logoutUser = (req, res) => {
   res.clearCookie("refresh_token");
   res.redirect("/login");
 };
+
+//get edit profile
+export const getEditProfilePage = async (req, res) => {
+  if(!req.user) return res.redirect("/");
+
+  const user = await findUserById(req.user.id);
+
+  if(!user) return res.status(404).send("User not found");
+
+  res.render("auth/edit-profile",{
+    name:user.name,
+    email:user.email,
+    isEmailValid:user.isEmailValid,
+    createdAt:user.createdAt,
+    links:user.links,
+    
+    
+    error: req.flash("error"),
+  })
+}
+
+//edit profile
+export const postEditProfile = async (req, res) => {
+  if(!req.user) return res.redirect("/");
+
+  const {name} = req.body;
+
+  await findUserById(req.user.id).then(async (user) => {
+    if(!user) return res.status(404).send("User not found");
+
+    user.name = name;
+
+    await db.update(usersTable)
+    .set(user)
+    .where(eq(usersTable.id, user.id))
+    .then(() => {
+      res.redirect("/profile");
+    })
+  })
+}
 
 // get profile page
 
