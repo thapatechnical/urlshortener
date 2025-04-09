@@ -171,6 +171,39 @@ export const getProfilePage = async (req, res) => {
     })
 }
 
+
+//getChangePasswordPage
+
+export const getChangePasswordPage = async (req, res) => {
+  if(!req.user) return res.redirect("/");
+
+  const user = await findUserById(req.user.id);
+
+  res.render("auth/change-password",{
+    error: req.flash("error"),
+  })
+}
+
+//postChangePassword
+
+export const postChangePassword = async (req, res) => {
+  if(!req.user) return res.redirect("/");
+
+  const {password} = req.body;
+
+  await findUserById(req.user.id).then(async (user) => {
+    if(!user) return res.status(404).send("User not found");
+
+    user.password = await hashPassword(password);
+
+    await db.update(usersTable)
+    .set(user)
+    .where(eq(usersTable.id, user.id))
+    .then(() => {
+      res.redirect("/profile");
+    })
+  })
+}
 // get verify email page
 
 export const getVerifyEmailPage = async (req, res) => {
