@@ -17,6 +17,7 @@ import {
   findVerificationEmailToken,
   clearVerifyEmailToken,
   sendNewVerifyEmailLink,
+  updateUserPassword,
 } from "../services/auth.services.js";
 import { registerUserSchema, loginUserSchema, verifyEmailSchema, verifyPasswordSchema } from "../validators/auth.validator.js";
 import { ACCESS_TOKEN_EXPIRY, REFRESH_TOKEN_EXPIRY } from "../config/constants.js";
@@ -186,21 +187,51 @@ export const getChangePasswordPage = async (req, res) => {
 
 //postChangePassword
 
-export const postChangePassword = async (req, res) => {
-  const { success, data, error } = verifyPasswordSchema.safeParse(req.body);
 
-  if (!success) {
-    const errorMessages = error.issues.map((issue) => issue.message);
+export const postChangePassword = async (req, res) => {
+  if (!req.user) return res.redirect("/login");
+
+  // Debug: Log the incoming request body
+  console.log("Request body:", req.body);
+
+  // Validate input
+  const validation = verifyPasswordSchema.safeParse(req.body);
+  
+  if (!validation.success) {
+    const errorMessages = validation.error.issues.map((issue) => issue.message);
     req.flash("error", errorMessages);
-    return res.redirect("/change-password"); 
+    return res.redirect("/change-password");
   }
 
-  console.log("data:", data);
-  
-  return res.redirect("/change-password");
+  // Destructure from validated data
+  const { currentPassword, newPassword, confirmPassword } = validation.data;
 
+  // Debug: Verify we have the password
+  console.log("New password received:", newPassword ? "exists" : "missing");
 
-  // Proceed with password update logic here...
+  const user = await findUserById(req.user.id);
+  if (!user) {
+    req.flash("error", "User not found");
+    return res.redirect("/change-password");
+  }
+
+  // Verify current password
+  const isPasswordValid = await comparePassword(currentPassword, user.password);
+  if (!isPasswordValid) {
+    req.flash("error", "Invalid current password");
+    return res.redirect("/change-password");
+  }
+
+  try {
+    // Update password
+    await updateUserPassword({userId:user.id, newPassword});
+    req.flash("success", "Password changed successfully");
+    return res.redirect("/profile");
+  } catch (err) {
+    console.error("Password change error:", err);
+    req.flash("error", "Failed to update password");
+    return res.redirect("/change-password");
+  }
 };
 
 // get verify email page
