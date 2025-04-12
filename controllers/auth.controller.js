@@ -18,6 +18,8 @@ import {
   clearVerifyEmailToken,
   sendNewVerifyEmailLink,
   updateUserPassword,
+  findUserByEmail,
+  createResetPasswordLink,
 } from "../services/auth.services.js";
 import { registerUserSchema, loginUserSchema, verifyEmailSchema, verifyPasswordSchema } from "../validators/auth.validator.js";
 import { ACCESS_TOKEN_EXPIRY, REFRESH_TOKEN_EXPIRY } from "../config/constants.js";
@@ -295,13 +297,29 @@ export const verifyEmailToken = async (req, res) => {
 
 
 // getResetPasswordPage
-
-// In your auth.controller.js
 export const getResetPasswordPage = (req, res) => {
   res.render('auth/reset-password', {
     formSubmitted: req.flash('formSubmitted')[0],
-    error: req.flash('error'), 
+    error: req.flash('errors'), 
     success: req.flash('success') 
    
   });
 };
+
+// postForgotPassword
+export const postForgotPassword = async (req, res) => {
+ const { data, error} = await forgotPasswordSchema.safeParseAsync(req.body);
+ 
+ if (error) {
+  const errorMessages = error.errors.map((err) => err.message);
+  req.flash("errors", errorMessages[0]);
+  return res.redirect("/reset-password");
+ }
+
+ const user = await findUserByEmail(data.email);
+
+if(user){
+  const resetPasswordLink = await createResetPasswordLink({userId:user.id});
+}
+
+}

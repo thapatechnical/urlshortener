@@ -33,7 +33,7 @@ router.route("/edit-profile").get(authControllers.getEditProfilePage).post(authC
 
 router.route("/change-password").get(authControllers.getChangePasswordPage).post(authControllers.postChangePassword);
 
-router.route("/reset-password").get(authControllers.getResetPasswordPage)
+router.route("/reset-password").get(authControllers.getResetPasswordPage).post(authControllers.postForgotPassword);
 
 router.route("/logout").get(authControllers.logoutUser);
 
