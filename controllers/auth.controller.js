@@ -18,7 +18,7 @@ import {
   clearVerifyEmailToken,
   sendNewVerifyEmailLink,
 } from "../services/auth.services.js";
-import { registerUserSchema, loginUserSchema, verifyEmailSchema } from "../validators/auth.validator.js";
+import { registerUserSchema, loginUserSchema, verifyEmailSchema, verifyPasswordSchema } from "../validators/auth.validator.js";
 import { ACCESS_TOKEN_EXPIRY, REFRESH_TOKEN_EXPIRY } from "../config/constants.js";
 import { name } from "ejs";
 import { eq, is } from "drizzle-orm";
@@ -187,23 +187,22 @@ export const getChangePasswordPage = async (req, res) => {
 //postChangePassword
 
 export const postChangePassword = async (req, res) => {
-  if(!req.user) return res.redirect("/");
+  const { success, data, error } = verifyPasswordSchema.safeParse(req.body);
 
-  const {password} = req.body;
+  if (!success) {
+    const errorMessages = error.issues.map((issue) => issue.message);
+    req.flash("error", errorMessages);
+    return res.redirect("/change-password"); 
+  }
 
-  await findUserById(req.user.id).then(async (user) => {
-    if(!user) return res.status(404).send("User not found");
+  console.log("data:", data);
+  
+  return res.redirect("/change-password");
 
-    user.password = await hashPassword(password);
 
-    await db.update(usersTable)
-    .set(user)
-    .where(eq(usersTable.id, user.id))
-    .then(() => {
-      res.redirect("/profile");
-    })
-  })
-}
+  // Proceed with password update logic here...
+};
+
 // get verify email page
 
 export const getVerifyEmailPage = async (req, res) => {

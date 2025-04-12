@@ -29,3 +29,13 @@ export const verifyEmailSchema = z.object({
   token:z.string().trim().length(8,{message:"Token must be 8 characters long"}),
   email:z.string().trim().email(),
 });
+
+
+export const verifyPasswordSchema = z.object({
+ currentPassword: z.string().trim().min(1, { message: "Password must be at least 6 characters long" }).max(100, { message: "Password must be at most 100 characters long" }),
+ newPassword: z.string().trim().min(6, { message: "Password must be at least 6 characters long" }).max(100, { message: "Password must be at most 100 characters long" }),
+ confirmPassword: z.string().trim().min(6, { message: "Password must be at least 6 characters long" }).max(100, { message: "Password must be at most 100 characters long" }),
+}).refine((data) => data.newPassword === data.confirmPassword, {
+  message: "Passwords do not match",
+  path: ["confirmPassword"],
+})
