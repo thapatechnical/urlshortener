@@ -292,3 +292,16 @@ export const verifyEmailToken = async (req, res) => {
 
   return res.redirect("/profile");
 };
+
+
+// getResetPasswordPage
+
+// In your auth.controller.js
+export const getResetPasswordPage = (req, res) => {
+  res.render('auth/reset-password', {
+    formSubmitted: req.flash('formSubmitted')[0],
+    error: req.flash('error'), 
+    success: req.flash('success') 
+   
+  });
+};

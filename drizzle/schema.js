@@ -1,5 +1,6 @@
-import { boolean, int, mysqlTable, timestamp, varchar } from "drizzle-orm/mysql-core";
+import { boolean, int, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
 import { relations, sql } from "drizzle-orm";
+import e from "connect-flash";
 
 // Users Table (Declared First)
 export const usersTable = mysqlTable("users", {
@@ -10,6 +11,15 @@ export const usersTable = mysqlTable("users", {
   isEmailValid: boolean().default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+// passwordResetToken Table
+export const passwordResetTokenTable = mysqlTable("password_reset_token", {
+  id: int().autoincrement().primaryKey(),
+  userId: int("user_id").notNull().references(() => usersTable.id, { onDelete: "cascade" }),
+  tokenHash:text("token_hash").notNull(),
+  expiresAt: timestamp("expires_at").default(sql`CURRENT_TIMESTAMP + INTERVAL 1 DAY `).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
 // Short Links Table
@@ -61,3 +71,5 @@ export const sessionsRelations = relations(sessionsTable, ({ one }) => ({
     references: [usersTable.id],
   }),
 }));
+
+
