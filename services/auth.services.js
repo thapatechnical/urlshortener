@@ -420,13 +420,15 @@ export const findUserByEmail = async (email) => {
 
 export const createResetPasswordLink = async ({ userId }) => {
   const randomToken = crypto.randomBytes(32).toString("hex");
-
   const tokenHash = crypto.createHash("sha256").update(randomToken).digest("hex");
   
   await db.delete(passwordResetTokenTable).where(eq(passwordResetTokenTable.userId, userId));
 
-  await db.insert(passwordResetTokenTable).values({ userId: userId, token: tokenHash });
+  // Fix: Use tokenHash instead of token to match your schema
+  await db.insert(passwordResetTokenTable).values({ 
+    userId: userId, 
+    tokenHash: tokenHash // Changed from 'token' to 'tokenHash'
+  });
  
-  return  `${process.env.FRONTEND_URL}/reset-password?token=${randomToken}`
-
+  return `${process.env.FRONTEND_URL}/reset-password?token=${randomToken}`;
 }

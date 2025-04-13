@@ -17,7 +17,7 @@ export const usersTable = mysqlTable("users", {
 export const passwordResetTokenTable = mysqlTable("password_reset_token", {
   id: int().autoincrement().primaryKey(),
   userId: int("user_id").notNull().references(() => usersTable.id, { onDelete: "cascade" }),
-  tokenHash:text("token_hash").notNull(),
+  tokenHash: text("token_hash"), 
   expiresAt: timestamp("expires_at").default(sql`CURRENT_TIMESTAMP + INTERVAL 1 DAY `).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });

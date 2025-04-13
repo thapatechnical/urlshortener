@@ -21,13 +21,14 @@ import {
   findUserByEmail,
   createResetPasswordLink,
 } from "../services/auth.services.js";
-import { registerUserSchema, loginUserSchema, verifyEmailSchema, verifyPasswordSchema } from "../validators/auth.validator.js";
+import { registerUserSchema, loginUserSchema, verifyEmailSchema, verifyPasswordSchema, forgotPasswordSchema } from "../validators/auth.validator.js";
 import { ACCESS_TOKEN_EXPIRY, REFRESH_TOKEN_EXPIRY } from "../config/constants.js";
 import { name } from "ejs";
 import { eq, is } from "drizzle-orm";
 import { sendEmail } from "../lib/nodemailer.js";
 import { db } from "../config/db.js";
 import { usersTable } from "../drizzle/schema.js";
+import { getHtmlFromMjmlTemplate } from "../lib/get-html-from-mjml-template.js";
 
 export const getRegisterPage = (req, res) => {
   if (req.user) return res.redirect("/");
@@ -308,18 +309,42 @@ export const getResetPasswordPage = (req, res) => {
 
 // postForgotPassword
 export const postForgotPassword = async (req, res) => {
- const { data, error} = await forgotPasswordSchema.safeParseAsync(req.body);
- 
- if (error) {
-  const errorMessages = error.errors.map((err) => err.message);
-  req.flash("errors", errorMessages[0]);
-  return res.redirect("/reset-password");
- }
+  const { data, error } = await forgotPasswordSchema.safeParseAsync(req.body);
+  
+  if (error) {
+    const errorMessages = error.errors.map((err) => err.message);
+    req.flash("errors", errorMessages[0]);
+    return res.redirect("/reset-password");
+  }
 
- const user = await findUserByEmail(data.email);
+  const user = await findUserByEmail(data.email);
+  
+  if (!user) {
+    // Don't reveal whether user exists
+    return res.redirect("/login");
+  }
 
-if(user){
-  const resetPasswordLink = await createResetPasswordLink({userId:user.id});
-}
+  try {
+    const resetPasswordLink = await createResetPasswordLink({ userId: user.id });
+    
+    const html = await getHtmlFromMjmlTemplate("reset-password-email", {
+      name: user.name,
+      link: resetPasswordLink,
+    });
 
+    // Add actual email sending logic here
+    await sendEmail({
+      to: user.email,
+      subject: "Reset your password",
+      html
+    });
+
+    req.flash("success", "Password reset link sent to your email");
+    req.flash("formSubmitted", true);
+    return res.redirect("/reset-password");
+  } catch (err) {
+    console.error("Password reset error:", err);
+    req.flash("errors", "Failed to send reset email");
+    return res.redirect("/reset-password");
+  }
 }

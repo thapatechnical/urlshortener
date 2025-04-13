@@ -1,0 +1,1 @@
+ALTER TABLE `password_reset_token` MODIFY COLUMN `token_hash` text;
