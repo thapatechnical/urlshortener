@@ -403,12 +403,19 @@ export const sendNewVerifyEmailLink = async ({ email, userId }) => {
 
 // updateUserPassword
 
-export const updateUserPassword = async ({ userId, newPassword }) => {
-  const hashedPassword = await hashPassword(newPassword);
-  return await db.update(usersTable)
-    .set({ password: hashedPassword })
-    .where(eq(usersTable.id, userId));
-};
+export const updateUserPassword = async ({userId, newPassword}) => {
+  console.log('Updating password for user:', userId); // Debug log
+  try {
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await db.update(usersTable)
+      .set({ password: hashedPassword })
+      .where(eq(usersTable.id, userId));
+    console.log('Password updated successfully'); // Debug log
+  } catch (error) {
+    console.error('Error updating password:', error); // Debug log
+    throw error;
+  }
+}
 
 
 export const findUserByEmail = async (email) => {
@@ -449,4 +456,13 @@ and (
 )
   );
    return data;
+}
+
+
+// clearResetPasswordToken
+
+export const clearResetPasswordToken = async (userId) => {
+   await db
+   .delete(passwordResetTokenTable)
+   .where(eq(passwordResetTokenTable.userId, userId));
 }

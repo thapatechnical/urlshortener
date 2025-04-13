@@ -21,6 +21,7 @@ import {
   findUserByEmail,
   createResetPasswordLink,
   getResetPasswordToken,
+  clearResetPasswordToken,
 } from "../services/auth.services.js";
 import { registerUserSchema, loginUserSchema, verifyEmailSchema, verifyPasswordSchema, forgotPasswordSchema } from "../validators/auth.validator.js";
 import { ACCESS_TOKEN_EXPIRY, REFRESH_TOKEN_EXPIRY } from "../config/constants.js";
@@ -365,6 +366,33 @@ export const getResetPasswordTokenPage = async (req, res) => {
      token,
    })
 
- 
+}
 
+// postResetPasswordToken
+
+export const postResetPasswordToken = async (req, res) => {
+  const {token} = req.params;
+  const passwordResetData = await getResetPasswordToken(token);
+
+  if (!passwordResetData) {
+    req.flash("errors", "password token is not matching");
+    return res.redirect("auth/wrong-reset-password-token");
+  }
+
+  const {data , error} =  verifyResetPasswordSchema.safeParse(req.body);
+  if (error) {
+    const errorMessages = error.errors.map((err) => err.message);
+    req.flash("errors", errorMessages[0]);
+    return res.redirect(`/reset-password/${token}`);
+  }
+
+  const {newPassword} = data;
+
+  const user = await findUserById(passwordResetData.userId);
+
+  await clearResetPasswordToken(user.id);
+
+  await updateUserPassword({userId: user.id, newPassword});
+
+  return res.redirect("/login");
 }
