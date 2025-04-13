@@ -20,6 +20,7 @@ import {
   updateUserPassword,
   findUserByEmail,
   createResetPasswordLink,
+  getResetPasswordToken,
 } from "../services/auth.services.js";
 import { registerUserSchema, loginUserSchema, verifyEmailSchema, verifyPasswordSchema, forgotPasswordSchema } from "../validators/auth.validator.js";
 import { ACCESS_TOKEN_EXPIRY, REFRESH_TOKEN_EXPIRY } from "../config/constants.js";
@@ -347,4 +348,23 @@ export const postForgotPassword = async (req, res) => {
     req.flash("errors", "Failed to send reset email");
     return res.redirect("/reset-password");
   }
+}
+
+// getResetPasswordTokenPage
+
+export const getResetPasswordTokenPage = async (req, res) => {
+   const {token} = req.params;
+   const passwordResetData = await getResetPasswordToken(token);
+
+   if (!passwordResetData) return res.redirect("auth/wrong-reset-password-token");
+
+   return  res.render("auth/forgot-password",{
+     formSubmitted: req.flash("formSubmitted")[0],
+     error: req.flash("errors"), 
+     success: req.flash("success"),
+     token,
+   })
+
+ 
+
 }
