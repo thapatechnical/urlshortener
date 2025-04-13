@@ -23,7 +23,7 @@ import {
   getResetPasswordToken,
   clearResetPasswordToken,
 } from "../services/auth.services.js";
-import { registerUserSchema, loginUserSchema, verifyEmailSchema, verifyPasswordSchema, forgotPasswordSchema } from "../validators/auth.validator.js";
+import { registerUserSchema, loginUserSchema, verifyEmailSchema, verifyPasswordSchema, forgotPasswordSchema, verifyResetPasswordSchema } from "../validators/auth.validator.js";
 import { ACCESS_TOKEN_EXPIRY, REFRESH_TOKEN_EXPIRY } from "../config/constants.js";
 import { name } from "ejs";
 import { eq, is } from "drizzle-orm";
@@ -371,28 +371,49 @@ export const getResetPasswordTokenPage = async (req, res) => {
 // postResetPasswordToken
 
 export const postResetPasswordToken = async (req, res) => {
-  const {token} = req.params;
-  const passwordResetData = await getResetPasswordToken(token);
+  const { token } = req.params;
+  
+  try {
+    // Verify token exists and is valid
+    const passwordResetData = await getResetPasswordToken(token);
+    if (!passwordResetData) {
+      req.flash("error", "Invalid or expired password reset token");
+      return res.redirect("/auth/wrong-reset-password-token");
+    }
 
-  if (!passwordResetData) {
-    req.flash("errors", "password token is not matching");
-    return res.redirect("auth/wrong-reset-password-token");
-  }
+    // Validate input
+    const { data, error } = verifyResetPasswordSchema.safeParse(req.body);
+    if (error) {
+      const errorMessages = error.errors.map((err) => err.message);
+      req.flash("error", errorMessages[0]);
+      return res.redirect(`/reset-password/${token}`);
+    }
 
-  const {data , error} =  verifyResetPasswordSchema.safeParse(req.body);
-  if (error) {
-    const errorMessages = error.errors.map((err) => err.message);
-    req.flash("errors", errorMessages[0]);
+    // Verify passwords match
+    if (data.newPassword !== data.confirmPassword) {
+      req.flash("error", "Passwords do not match");
+      return res.redirect(`/reset-password/${token}`);
+    }
+
+    // Get user and update password
+    const user = await findUserById(passwordResetData.userId);
+    if (!user) {
+      req.flash("error", "User not found");
+      return res.redirect(`/reset-password/${token}`);
+    }
+
+    // Clear token and update password
+    await Promise.all([
+      clearResetPasswordToken(user.id),
+      updateUserPassword({ userId: user.id, newPassword: data.newPassword })
+    ]);
+
+    req.flash("success", "Password updated successfully. You can now login with your new password.");
+    return res.redirect("/login");
+    
+  } catch (error) {
+    console.error("Password reset error:", error);
+    req.flash("error", "Failed to reset password. Please try again.");
     return res.redirect(`/reset-password/${token}`);
   }
-
-  const {newPassword} = data;
-
-  const user = await findUserById(passwordResetData.userId);
-
-  await clearResetPasswordToken(user.id);
-
-  await updateUserPassword({userId: user.id, newPassword});
-
-  return res.redirect("/login");
-}
+};

@@ -403,17 +403,19 @@ export const sendNewVerifyEmailLink = async ({ email, userId }) => {
 
 // updateUserPassword
 
-export const updateUserPassword = async ({userId, newPassword}) => {
-  console.log('Updating password for user:', userId); // Debug log
+export const updateUserPassword = async ({ userId, newPassword }) => {
   try {
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    // Use consistent hashing (argon2 instead of bcrypt)
+    const hashedPassword = await hashPassword(newPassword);
+    
     await db.update(usersTable)
       .set({ password: hashedPassword })
       .where(eq(usersTable.id, userId));
-    console.log('Password updated successfully'); // Debug log
+      
+    return true;
   } catch (error) {
-    console.error('Error updating password:', error); // Debug log
-    throw error;
+    console.error('Password update error:', error);
+    throw new Error('Failed to update password');
   }
 }
 
