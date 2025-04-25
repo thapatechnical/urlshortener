@@ -24,13 +24,15 @@ import {
   clearResetPasswordToken,
 } from "../services/auth.services.js";
 import { registerUserSchema, loginUserSchema, verifyEmailSchema, verifyPasswordSchema, forgotPasswordSchema, verifyResetPasswordSchema } from "../validators/auth.validator.js";
-import { ACCESS_TOKEN_EXPIRY, REFRESH_TOKEN_EXPIRY } from "../config/constants.js";
+import { ACCESS_TOKEN_EXPIRY, OAUTH_EXCHANGE_EXPIRY, REFRESH_TOKEN_EXPIRY } from "../config/constants.js";
 import { name } from "ejs";
 import { eq, is } from "drizzle-orm";
 import { sendEmail } from "../lib/nodemailer.js";
 import { db } from "../config/db.js";
 import { usersTable } from "../drizzle/schema.js";
 import { getHtmlFromMjmlTemplate } from "../lib/get-html-from-mjml-template.js";
+import { generateCodeVerifier, generateState, Google } from "arctic";
+import { google } from "../lib/oauth/google.js";
 
 export const getRegisterPage = (req, res) => {
   if (req.user) return res.redirect("/");
@@ -417,3 +419,29 @@ export const postResetPasswordToken = async (req, res) => {
     return res.redirect(`/reset-password/${token}`);
   }
 };
+
+// getGoogleLoginPage
+
+export const getGoogleLoginPage =async(req, res) => {
+  if (req.user) return res.redirect("/");
+
+  const state = generateState();
+  const codeVerifier = generateCodeVerifier();
+  const url = google.createAuthorizationURL(state, codeVerifier,[
+    "openid",
+    "profile",
+    "email",
+
+  ]);
+
+  const cookieConfig = {
+    httpOnly: true,
+    secure: true,
+    maxAge: OAUTH_EXCHANGE_EXPIRY,
+    sameSite:"lax",
+  };
+
+  res.cookie("google_oauth_state", state, cookieConfig);
+  res.cookie("google_oauth_code_verifier", codeVerifier, cookieConfig);
+  res.redirect(url.toString());
+}

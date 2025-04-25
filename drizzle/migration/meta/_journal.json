@@ -15,6 +15,13 @@
       "when": 1744523837088,
       "tag": "0001_tense_pretty_boy",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1745596174747,
+      "tag": "0002_worthless_puck",
+      "breakpoints": true
     }
   ]
 }

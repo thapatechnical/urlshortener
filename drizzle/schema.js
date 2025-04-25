@@ -1,6 +1,18 @@
-import { boolean, int, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
+import { boolean, int, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
 import { relations, sql } from "drizzle-orm";
 import e from "connect-flash";
+
+//oAuthAccounts Table
+export const oAuthAccountsTable = mysqlTable("o_auth_accounts", {
+  id: int().autoincrement().primaryKey(),
+  userId: int("user_id")
+  .notNull()
+  .references(() => usersTable.id, { onDelete: "cascade" }),
+  provider: mysqlEnum("provider", [ "google", "github" ]).notNull(),
+  providerAccountId: varchar("provider_account_id", { length: 255 }).notNull().unique(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 
 // Users Table (Declared First)
 export const usersTable = mysqlTable("users", {
