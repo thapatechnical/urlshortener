@@ -1,6 +1,6 @@
 import { and, eq, gte, lt, sql } from "drizzle-orm";
 import { db } from "../config/db.js";
-import { passwordResetTokenTable, sessionsTable, shortLinksTable, usersTable, verifyEmailTokenTable } from "../drizzle/schema.js";
+import { oAuthAccountsTable, passwordResetTokenTable, sessionsTable, shortLinksTable, usersTable, verifyEmailTokenTable } from "../drizzle/schema.js";
 import argon2 from "argon2";
 import jwt from "jsonwebtoken";
 import { ACCESS_TOKEN_EXPIRY, MILLISECONDS_PER_SECOND, REFRESH_TOKEN_EXPIRY } from "../config/constants.js";
@@ -468,3 +468,68 @@ export const clearResetPasswordToken = async (userId) => {
    .delete(passwordResetTokenTable)
    .where(eq(passwordResetTokenTable.userId, userId));
 }
+
+
+// getUserWithOauthId
+
+export const getUserWithOauthId = async ({ email,provider }) => {
+
+  const [user] = await db
+  .select({
+    id: usersTable.id,
+    name: usersTable.name,
+    email: usersTable.email,
+    isEmailValid: usersTable.isEmailValid,
+    providerAccountId: oAuthAccountsTable.providerAccountId,
+    provider: oAuthAccountsTable.provider,
+  })
+  .from(usersTable)
+  .where(eq(usersTable.email, email))
+  .leftJoin(oAuthAccountsTable, and (
+    eq(oAuthAccountsTable.provider, provider),
+    eq(oAuthAccountsTable.userId, usersTable.id)
+  ));
+
+  return user;
+
+}
+
+export async function linkUserWithOauthId({
+  userId,
+  providerAccountId,
+  provider,
+}) {
+
+  return db.insert(oAuthAccountsTable).values({
+    userId,
+    providerAccountId,
+    provider,
+  });
+}
+
+export async function  createUserWithOauthId({
+  name,
+  email,
+  providerAccountId,
+  provider,
+}) {
+  const user = await db.transaction(async(trx)=>{
+    const [user] = await trx
+    .insert(usersTable)
+    .values({
+      name,
+      email,
+      isEmailValid: false,
+    })
+    .$returningId();
+    
+    await trx.insert(oAuthAccountsTable).values({
+      userId: user.id,
+      providerAccountId,
+      provider,
+    });
+    return user;
+  })
+  
+}
+  

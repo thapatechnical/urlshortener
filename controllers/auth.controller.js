@@ -22,6 +22,8 @@ import {
   createResetPasswordLink,
   getResetPasswordToken,
   clearResetPasswordToken,
+  getUserWithOauthId,
+  linkUserWithOauthId,
 } from "../services/auth.services.js";
 import { registerUserSchema, loginUserSchema, verifyEmailSchema, verifyPasswordSchema, forgotPasswordSchema, verifyResetPasswordSchema } from "../validators/auth.validator.js";
 import { ACCESS_TOKEN_EXPIRY, OAUTH_EXCHANGE_EXPIRY, REFRESH_TOKEN_EXPIRY } from "../config/constants.js";
@@ -31,7 +33,7 @@ import { sendEmail } from "../lib/nodemailer.js";
 import { db } from "../config/db.js";
 import { usersTable } from "../drizzle/schema.js";
 import { getHtmlFromMjmlTemplate } from "../lib/get-html-from-mjml-template.js";
-import { generateCodeVerifier, generateState, Google } from "arctic";
+import { decodeIdToken, generateCodeVerifier, generateState, Google } from "arctic";
 import { google } from "../lib/oauth/google.js";
 
 export const getRegisterPage = (req, res) => {
@@ -445,3 +447,156 @@ export const getGoogleLoginPage =async(req, res) => {
   res.cookie("google_oauth_code_verifier", codeVerifier, cookieConfig);
   res.redirect(url.toString());
 }
+
+
+// getGoogleLoginCallback
+
+// export const getGoogleLoginCallback = async (req, res) => {
+//   const { state, code } = req.query;
+
+//   console.log("state", state);  
+//   console.log("code", code);
+
+//   const {
+//     google_oauth_state:storedState,
+//     google_oauth_code_verifier:codeVerifier,
+//   } = req.cookies;
+
+//   if(
+//     !code ||
+//     !state ||
+//     !storedState ||
+//     !codeVerifier ||
+//     state !== storedState
+//   ) {
+//     req.flash("error", "Invalid or expired state parameter");
+//     return res.redirect("/login");
+//   }
+//   console.log("token google", tokens);
+  
+//   const claims = decodeIdToken(tokens.idToken());
+//   const {sub: googleUserId, email, name} = claims;
+//   console.log("googleID", googleID);
+
+// //if user is alresy linked then we will getteh user
+
+// let user = await getUserWithOauthId({
+//   provider: "google",
+//   email,
+// });
+
+// //user exitss but is not linked with outh
+
+// if(user && !user.providerAccountId) {
+//   await linkUserWithOauthId({
+//     provider: "google",
+//     providerAccountId: googleUserId,
+//     userId: user.id,
+//   });
+// }
+
+// // if user doesnt exit 
+
+// if(!user) {
+//   user = await createUserWithOauthId({
+//     name,
+//     email,
+//     provider: "google",
+//     providerAccountId: googleUserId,
+//   });
+  
+// }
+
+// await authenticateUser({
+//   req,
+//   res,
+//   user,
+//   name,
+//   email,
+// });
+// res.redirect("/");
+
+// }
+
+export const getGoogleLoginCallback = async (req, res) => {
+  const { state, code } = req.query;
+
+  console.log("state", state);  
+  console.log("code", code);
+
+  const {
+    google_oauth_state: storedState,
+    google_oauth_code_verifier: codeVerifier,
+  } = req.cookies;
+
+  if (
+    !code ||
+    !state ||
+    !storedState ||
+    !codeVerifier ||
+    state !== storedState
+  ) {
+    req.flash("error", "Invalid or expired state parameter");
+    return res.redirect("/login");
+  }
+
+  try {
+    // Exchange the authorization code for tokens
+    const tokens = await google.validateAuthorizationCode(code, codeVerifier);
+    console.log("tokens", tokens);
+
+    // Extract the id_token from the tokens.data object
+    const idToken = tokens.data.id_token;
+    if (!idToken) {
+      throw new Error("No ID token received from Google");
+    }
+
+    const claims = decodeIdToken(idToken); // Pass the extracted id_token
+    const { sub: googleUserId, email, name } = claims;
+    console.log("googleUserId", googleUserId);
+
+    // If user is already linked then we will get the user
+    let user = await getUserWithOauthId({
+      provider: "google",
+      email,
+    });
+
+    // User exists but is not linked with OAuth
+    if (user && !user.providerAccountId) {
+      await linkUserWithOauthId({
+        provider: "google",
+        providerAccountId: googleUserId,
+        userId: user.id,
+      });
+    }
+
+    // If user doesn't exist
+    if (!user) {
+      user = await createUserWithOauthId({
+        name,
+        email,
+        provider: "google",
+        providerAccountId: googleUserId,
+      });
+    }
+
+    await authenticateUser({
+      req,
+      res,
+      user,
+      name,
+      email,
+    });
+    
+    // Clear cookies after successful authentication
+    res.clearCookie("google_oauth_state");
+    res.clearCookie("google_oauth_code_verifier");
+    
+    return res.redirect("/");
+    
+  } catch (error) {
+    console.error("Google OAuth error:", error);
+    req.flash("error", "Failed to authenticate with Google");
+    return res.redirect("/login");
+  }
+};
