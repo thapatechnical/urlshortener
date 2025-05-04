@@ -15,6 +15,20 @@
       "when": 1743232719520,
       "tag": "0001_daily_nova",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1745395484520,
+      "tag": "0002_tense_killraven",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1745395832707,
+      "tag": "0003_spooky_maverick",
+      "breakpoints": true
     }
   ]
 }
