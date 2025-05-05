@@ -42,6 +42,7 @@ import {
 } from "../validators/auth-validator.js";
 import { OAUTH_EXCHANGE_EXPIRY } from "../config/constants.js";
 import { google } from "../lib/oauth/google.js";
+import { github } from "../lib/oauth/github.js";
 
 export const getRegisterPage = (req, res) => {
   if (req.user) return res.redirect("/");
@@ -494,6 +495,106 @@ export const getGoogleLoginCallback = async (req, res) => {
       providerAccountId: googleUserId,
     });
   }
+  await authenticateUser({ req, res, user, name, email });
+
+  res.redirect("/");
+};
+
+//getGithubLoginPage
+
+export const getGithubLoginPage = async (req, res) => {
+  if (req.user) return res.redirect("/");
+
+  const state = generateState();
+
+  const url = github.createAuthorizationURL(state, ["user:email"]);
+
+  const cookieConfig = {
+    httpOnly: true,
+    secure: true,
+    maxAge: OAUTH_EXCHANGE_EXPIRY,
+    sameSite: "lax", // this is such that when google redirects to our website, cookies are maintained
+  };
+
+  res.cookie("github_oauth_state", state, cookieConfig);
+
+  res.redirect(url.toString());
+};
+
+//getGithubLoginCallback
+export const getGithubLoginCallback = async (req, res) => {
+  const { code, state } = req.query;
+  const { github_oauth_state: storedState } = req.cookies;
+
+  function handleFailedLogin() {
+    req.flash(
+      "errors",
+      "Couldn't login with GitHub because of invalid login attempt. Please try again!"
+    );
+    return res.redirect("/login");
+  }
+
+  if (!code || !state || !storedState || state !== storedState) {
+    return handleFailedLogin();
+  }
+
+  let tokens;
+  try {
+    tokens = await github.validateAuthorizationCode(code);
+  } catch {
+    return handleFailedLogin();
+  }
+
+  const githubUserResponse = await fetch("https://api.github.com/user", {
+    headers: {
+      Authorization: `Bearer ${tokens.accessToken()}`,
+    },
+  });
+  if (!githubUserResponse.ok) return handleFailedLogin();
+  const githubUser = await githubUserResponse.json();
+  const { id: githubUserId, name } = githubUser;
+
+  const githubEmailResponse = await fetch(
+    "https://api.github.com/user/emails",
+    {
+      headers: {
+        Authorization: `Bearer ${tokens.accessToken()}`,
+      },
+    }
+  );
+  if (!githubEmailResponse.ok) return handleFailedLogin();
+
+  const emails = await githubEmailResponse.json();
+  const email = emails.filter((e) => e.primary)[0].email; // In GitHub we can have multiple emails, but we only want primary email
+  if (!email) return handleFailedLogin();
+
+  // there are few things that we should do
+  //! Condition 1: User already exists with github's oauth linked
+  //! Condition 2: User already exists with the same email but google's oauth isn't linked
+  //! Condition 3: User doesn't exist.
+
+  let user = await getUserWithOauthId({
+    provider: "github",
+    email,
+  });
+
+  if (user && !user.providerAccountId) {
+    await linkUserWithOauth({
+      userId: user.id,
+      provider: "github",
+      providerAccountId: githubUserId,
+    });
+  }
+
+  if (!user) {
+    user = await createUserWithOauth({
+      name,
+      email,
+      provider: "github",
+      providerAccountId: githubUserId,
+    });
+  }
+
   await authenticateUser({ req, res, user, name, email });
 
   res.redirect("/");
