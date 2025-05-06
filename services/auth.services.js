@@ -533,3 +533,67 @@ export async function  createUserWithOauthId({
   
 }
   
+// getUserWithOauthId
+
+export const getGithubUserWithOauthId = async ({ email, provider }) => {
+  const [user] = await db
+    .select({
+      id: usersTable.id,
+      name: usersTable.name,
+      email: usersTable.email,
+      isEmailValid: usersTable.isEmailValid,
+      providerAccountId: oAuthAccountsTable.providerAccountId,
+      provider: oAuthAccountsTable.provider,
+    })
+    .from(usersTable)
+    .where(eq(usersTable.email, email))
+    .leftJoin(oAuthAccountsTable, and(
+      eq(oAuthAccountsTable.provider, provider),
+      eq(oAuthAccountsTable.userId, usersTable.id)
+    ));
+
+  return user;
+}
+
+// linkGithubUserWithOauthId
+
+export async function linkGithubUserWithOauthId({
+  userId,
+  providerAccountId,
+  provider,
+}) {
+  return db.insert(oAuthAccountsTable).values({
+    userId,
+    providerAccountId,
+    provider,
+  });
+}
+
+// createGithubUserWithOauthId
+
+export async function createGithubUserWithOauthId({
+  name,
+  email,
+  providerAccountId,
+  provider,
+}) {
+  const user = await db.transaction(async (trx) => {
+    const [user] = await trx
+      .insert(usersTable)
+      .values({
+        name,
+        email,
+        isEmailValid: false,
+      })
+      .$returningId();
+
+    await trx.insert(oAuthAccountsTable).values({
+      userId: user.id,
+      providerAccountId,
+      provider,
+    });
+    return user;
+  });
+
+  return user;
+}

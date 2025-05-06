@@ -14,6 +14,7 @@ export const oAuthAccountsTable = mysqlTable("o_auth_accounts", {
 });
 
 
+
 // Users Table (Declared First)
 export const usersTable = mysqlTable("users", {
   id: int().autoincrement().primaryKey(),

@@ -24,6 +24,9 @@ import {
   clearResetPasswordToken,
   getUserWithOauthId,
   linkUserWithOauthId,
+  getGithubUserWithOauthId,
+  linkGithubUserWithOauthId,
+  createGithubUserWithOauthId,
 } from "../services/auth.services.js";
 import { registerUserSchema, loginUserSchema, verifyEmailSchema, verifyPasswordSchema, forgotPasswordSchema, verifyResetPasswordSchema } from "../validators/auth.validator.js";
 import { ACCESS_TOKEN_EXPIRY, OAUTH_EXCHANGE_EXPIRY, REFRESH_TOKEN_EXPIRY } from "../config/constants.js";
@@ -35,6 +38,7 @@ import { usersTable } from "../drizzle/schema.js";
 import { getHtmlFromMjmlTemplate } from "../lib/get-html-from-mjml-template.js";
 import { decodeIdToken, generateCodeVerifier, generateState, Google } from "arctic";
 import { google } from "../lib/oauth/google.js";
+import { github } from "../lib/oauth/github.js";
 
 export const getRegisterPage = (req, res) => {
   if (req.user) return res.redirect("/");
@@ -600,3 +604,122 @@ export const getGoogleLoginCallback = async (req, res) => {
     return res.redirect("/login");
   }
 };
+
+// getGithubLoginPage
+
+export const getGithubLoginPage = (req, res) => {
+  if (req.user) return res.redirect("/");
+
+  const state = generateState();
+
+  const url = github.createAuthorizationURL(state,[
+    "user:email",
+  ]);
+
+  const cookieConfig = {
+    httpOnly: true,
+    secure: true,
+    maxAge: OAUTH_EXCHANGE_EXPIRY,
+    sameSite:"lax",
+  };
+
+  res.cookie("github_oauth_state", state, cookieConfig);
+  res.redirect(url.toString());
+}
+
+// getGithubLoginCallback
+
+export const getGithubLoginCallback = async (req, res) => {
+  const { state, code } = req.query;
+
+  const {
+    github_oauth_state: storedState,
+  } = req.cookies;
+
+
+  function handleFailedLogin() {
+    req.flash("error", message);
+    return res.redirect("/login");
+  }
+
+  if (!code || !state || !storedState || state !== storedState) {
+    return handleFailedLogin();
+  }
+
+  let tokens;
+  try {
+    tokens = await github.validateAuthorizationCode(code);
+  } catch {
+    return handleFailedLogin("Failed to exchange authorization code for tokens");
+  }
+
+  const githubResponse = await fetch("https://api.github.com/user", {
+    headers: {
+      Authorization: `Bearer ${tokens.accessToken()}`,
+    },
+  });
+  if (!githubResponse.ok) {
+    return handleFailedLogin("Failed to fetch user data from GitHub");
+  }
+  const githubUser = await githubResponse.json();
+
+  const { id: githubUserId,   name } = githubUser;
+  console.log("githubUserId", githubUserId);
+
+   const githubEmailResponse = await fetch("https://api.github.com/user/emails", {
+    headers: {
+      Authorization: `Bearer ${tokens.accessToken()}`,
+    },
+  });
+  if (!githubEmailResponse.ok) {
+    return handleFailedLogin("Failed to fetch email data from GitHub");
+  }
+   const emails = await githubEmailResponse.json();
+   const email = emails.filter((e)=>e.primary)[0].email;
+  console.log("email", email);
+
+  if (!email) {
+    return handleFailedLogin("No email found in GitHub response");
+  }
+
+  // If user is already linked then we will get the user
+  let user = await getGithubUserWithOauthId({
+    provider: "github",
+    email,
+  });
+
+  // User exists but is not linked with OAuth
+  if (user && !user.providerAccountId) {
+    await linkGithubUserWithOauthId({
+      provider: "github",
+      providerAccountId: githubUserId,
+      userId: user.id,
+    });
+  }
+
+  // If user doesn't exist
+  if (!user) {
+    user = await createGithubUserWithOauthId({
+      name,
+      email,
+      provider: "github",
+      providerAccountId: githubUserId,
+    });
+  }
+
+  await authenticateUser({
+    req,
+    res,
+    user,
+    name,
+    email,
+  });
+  
+  // Clear cookies after successful authentication
+  res.clearCookie("github_oauth_state");
+  res.clearCookie("github_oauth_code_verifier");
+  
+  return res.redirect("/");
+
+
+}

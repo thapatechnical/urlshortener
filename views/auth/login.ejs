@@ -15,6 +15,8 @@
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <!-- Include Material Design Icon Font -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css">
+    <!-- Include GitHub Octicons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/octicons/4.4.0/font/octicons.min.css">
   </head>
   <body class="bg-gray-100">
     <%- include('../partials/header') %>
@@ -117,7 +119,13 @@
                 </button>
               </a>
               
-           
+              <!-- Custom GitHub Sign-In Button -->
+              <a href="/github" class="w-full max-w-xs">
+                <button class="w-full flex items-center justify-center gap-2 bg-white border border-gray-300 rounded-lg px-4 py-2 text-gray-700 hover:bg-gray-50 transition duration-200">
+                  <span class="octicon octicon-mark-github text-gray-800"></span>
+                  <span>Sign in with GitHub</span>
+                </button>
+              </a>
             </div>
           </div>
         </div>
