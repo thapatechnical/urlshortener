@@ -41,3 +41,5 @@ coverage/
 .env
 # Miscellaneous
 !.gitkeep
+.gitignore
+.env
