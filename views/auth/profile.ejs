@@ -97,9 +97,15 @@
         <a href="/edit-profile" class="btn">
           <i class="zmdi zmdi-edit"></i> Edit Profile
         </a>
+        <% if(user.hasPassword) { %>
         <a href="/change-password" class="btn">
           <i class="zmdi zmdi-key"></i> Change Password
         </a>
+        <% } else { %>
+        <a href="/set-password" class="btn">
+          <i class="zmdi zmdi-key"></i> Set Password
+        </a>
+        <% } %>
         <a href="/logout" class="btn">
           <i class="zmdi zmdi-power"></i> Logout
         </a>

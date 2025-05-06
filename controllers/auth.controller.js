@@ -35,6 +35,7 @@ import {
   forgotPasswordSchema,
   loginUserSchema,
   registerUserSchema,
+  setPasswordSchema,
   verifyEmailSchema,
   verifyPasswordSchema,
   verifyResetPasswordSchema,
@@ -183,6 +184,7 @@ export const getProfilePage = async (req, res) => {
       name: user.name,
       email: user.email,
       isEmailValid: user.isEmailValid,
+      hasPassword: Boolean(user.password),
       createdAt: user.createdAt,
       links: userShortLinks,
     },
@@ -598,4 +600,41 @@ export const getGithubLoginCallback = async (req, res) => {
   await authenticateUser({ req, res, user, name, email });
 
   res.redirect("/");
+};
+
+//getSetPasswordPage
+export const getSetPasswordPage = async (req, res) => {
+  if (!req.user) return res.redirect("/");
+
+  return res.render("auth/set-password", {
+    errors: req.flash("errors"),
+  });
+};
+
+//postSetPassword
+export const postSetPassword = async (req, res) => {
+  if (!req.user) return res.redirect("/");
+
+  const { data, error } = setPasswordSchema.safeParse(req.body);
+
+  if (error) {
+    const errorMessages = error.errors.map((err) => err.message);
+    req.flash("errors", errorMessages);
+    return res.redirect("/set-password");
+  }
+
+  const { newPassword } = data;
+
+  const user = await findUserById(req.user.id);
+  if (user.password) {
+    req.flash(
+      "errors",
+      "You already have your Password, Instead Change your password"
+    );
+    return res.redirect("/set-password");
+  }
+
+  await updateUserPassword({ userId: req.user.id, newPassword });
+
+  return res.redirect("/profile");
 };
