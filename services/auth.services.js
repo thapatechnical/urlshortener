@@ -472,12 +472,20 @@ export async function linkUserWithOauth({
   userId,
   provider,
   providerAccountId,
+  avatarUrl,
 }) {
   await db.insert(oauthAccountsTable).values({
     userId,
     provider,
     providerAccountId,
   });
+
+  if (avatarUrl) {
+    await db
+      .update(usersTable)
+      .set({ avatarUrl })
+      .where(and(eq(usersTable.id, userId), isNull(usersTable.avatarUrl)));
+  }
 }
 
 export async function createUserWithOauth({
@@ -485,6 +493,7 @@ export async function createUserWithOauth({
   email,
   provider,
   providerAccountId,
+  avatarUrl,
 }) {
   const user = await db.transaction(async (trx) => {
     const [user] = await trx
@@ -493,6 +502,7 @@ export async function createUserWithOauth({
         email,
         name,
         // password: "",
+        avatarUrl,
         isEmailValid: true, // we know that google's email are valid
       })
       .$returningId();

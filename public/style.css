@@ -710,6 +710,13 @@ footer .social-links a:hover {
   border: 3px solid rgba(255, 255, 255, 0.5);
 }
 
+.avatar-placeholder img {
+  border-radius: 50%;
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+  width: 8rem;
+  height: 8rem;
+}
+
 .avatar-placeholder span {
   font-size: 2.5rem;
   font-weight: 600;
@@ -1187,9 +1194,41 @@ footer .social-links a:hover {
   background-color: rgba(37, 99, 235, 0.05);
 }
 
-article {
-  padding-left: 15px;
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px 0;
+  gap: 5px;
 }
-.code {
+
+.page-link {
+  display: inline-block;
+  padding: 5px 10px;
+  border: 1px solid #ddd;
+  color: #333;
+  text-decoration: none;
+  border-radius: 3px;
+  transition: all 0.2s ease;
+}
+
+.page-link:hover:not(.current):not(.disabled) {
+  background-color: #f5f5f5;
+  border-color: #ccc;
+}
+
+.page-link.current {
+  background-color: #4a89dc;
   color: white;
+  border-color: #4a89dc;
+  cursor: default;
+}
+
+.page-link.disabled {
+  color: #aaa;
+  cursor: not-allowed;
+}
+
+.ellipsis {
+  margin: 0 5px;
 }

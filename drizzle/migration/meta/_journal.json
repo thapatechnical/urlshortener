@@ -29,6 +29,13 @@
       "when": 1745395832707,
       "tag": "0003_spooky_maverick",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1746587837201,
+      "tag": "0004_strange_swordsman",
+      "breakpoints": true
     }
   ]
 }

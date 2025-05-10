@@ -130,6 +130,29 @@
       </section>
     </div>
 
+      <%# Pagination component %>
+      <% if (totalPages > 1) { %>
+           <div class="pagination">
+             <%# Previous page link %>
+             <% if (currentPage > 1) { %>
+               <a href="?page=<%= currentPage - 1 %>" class="page-link">&laquo; Previous</a>
+             <% } else { %>
+               <span class="page-link disabled">&laquo; Previous</span>
+             <% } %>
+
+             <span class="page-link "> <%= currentPage %></span>
+  
+             <%# Next page link %>
+             <% if (currentPage < totalPages) { %>
+               <a href="?page=<%= currentPage + 1 %>" class="page-link">Next &raquo;</a>
+             <% } else { %>
+               <span class="page-link disabled">Next &raquo;</span>
+             <% } %>
+
+           </div>
+         <% } %>
+
+    
     <%- include('./partials/footer.ejs') %>
 
     <script>

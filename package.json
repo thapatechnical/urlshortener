@@ -8,7 +8,8 @@
     "start": "node --env-file=.env app.js",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "db:seed": "node --env-file=.env drizzle/seed.js"
   },
   "keywords": [],
   "author": "",
@@ -22,6 +23,7 @@
     "connect-flash": "^0.1.1",
     "cookie-parser": "^1.4.7",
     "drizzle-orm": "^0.39.3",
+    "drizzle-seed": "^0.3.1",
     "ejs": "^3.1.10",
     "express": "^5.0.1",
     "express-session": "^1.18.1",
