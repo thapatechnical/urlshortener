@@ -140,7 +140,49 @@
                <span class="page-link disabled">&laquo; Previous</span>
              <% } %>
 
-             <span class="page-link "> <%= currentPage %></span>
+          
+
+                   <%# Page numbers %>
+          <% 
+             // Calculate the range of page numbers to display
+             let startPage = Math.max(1, currentPage - 2);
+             let endPage = Math.min(totalPages, currentPage + 2);
+
+                         // Ensure 5 pages are shown if possible
+while (endPage - startPage < 4 && startPage > 1) {
+  startPage--;
+}
+while (endPage - startPage < 4 && endPage < totalPages) {
+  endPage++;
+}
+
+           %>
+<% 
+                 // Always show first pge
+            if (startPage > 1) { %>
+               <a href="?page=1" class="page-link">1</a>
+               <% if (startPage > 2) { %>
+                 <span class="ellipsis">...</span>
+               <% } %>
+             <% } %>
+        
+               <%# Show page numbers around current page %>
+             <% for (let i = startPage; i <= endPage; i++) { %>
+               <% if (i === currentPage) { %>
+                 <span class="page-link current"><%= i %></span>
+               <% } else { %>
+                 <a href="?page=<%= i %>" class="page-link"><%= i %></a>
+               <% } %>
+             <% } %>
+ 
+                     <%# Always show last page %>
+             <% if (endPage < totalPages) { %>
+               <% if (endPage < totalPages - 1) { %>
+                 <span class="ellipsis">...</span>
+               <% } %>
+               <a href="?page=<%= totalPages %>" class="page-link"><%= totalPages %></a>
+             <% } %>
+                      
   
              <%# Next page link %>
              <% if (currentPage < totalPages) { %>
