@@ -252,6 +252,7 @@ export const getEditProfilePage = async (req, res) => {
 
   return res.render("auth/edit-profile", {
     name: user.name,
+    avatarUrl: user.avatarUrl,
     errors: req.flash("errors"),
   });
 };
@@ -268,7 +269,15 @@ export const postEditProfile = async (req, res) => {
     return res.redirect("/edit-profile");
   }
 
-  await updateUserByName({ userId: req.user.id, name: data.name });
+  // await updateUserByName({ userId: req.user.id, name: data.name });
+
+  const fileUrl = req.file ? `uploads/avatar/${req.file.filename}` : undefined;
+
+  await updateUserByName({
+    userId: req.user.id,
+    name: data.name,
+    avatarUrl: fileUrl,
+  });
 
   return res.redirect("/profile");
 };

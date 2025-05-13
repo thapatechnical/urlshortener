@@ -29,6 +29,7 @@
     "express-session": "^1.18.1",
     "jsonwebtoken": "^9.0.2",
     "mjml": "^4.15.3",
+    "multer": "^1.4.5-lts.2",
     "mysql2": "^3.12.0",
     "nodemailer": "^6.10.0",
     "request-ip": "^3.3.0",
