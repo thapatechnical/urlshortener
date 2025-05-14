@@ -1232,3 +1232,8 @@ footer .social-links a:hover {
 .ellipsis {
   margin: 0 5px;
 }
+
+#avatar-preview-img {
+  width: 15rem;
+  height: 12rem;
+}

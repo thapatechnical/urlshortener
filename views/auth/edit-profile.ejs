@@ -104,5 +104,60 @@
     </div>
 
     <%- include('../partials/footer.ejs') %>
+
+    <script>
+           //  Preview uploaded image
+       document.getElementById('avatar').addEventListener('change', function(e) {
+         const file = e.target.files[0];
+         console.log("file ", e);
+         
+         if (file) {
+           const reader = new FileReader();
+           reader.onload = function(event) {
+             const avatarPreviewImg = document.getElementById('avatar-preview-img');
+             avatarPreviewImg.src = event.target.result; // Contains the file's data as a base64 string.
+             avatarPreviewImg.style.display = 'block';
+             
+             const placeholder = document.getElementById('avatar-placeholder');
+             if (placeholder) {
+               placeholder.style.display = 'none';
+             }
+           }
+           reader.readAsDataURL(file); // file = input.files[0]
+         }
+       });
+
+           // Handle remove avatar button if it exists
+       const removeAvatarBtn = document.getElementById('remove-avatar');
+       if (removeAvatarBtn) {
+         removeAvatarBtn.addEventListener('click', function() {
+           // Add a hidden input to indicate avatar removal
+           const hiddenInput = document.createElement('input');
+           hiddenInput.type = 'hidden';
+           hiddenInput.name = 'removeAvatar';
+           hiddenInput.value = 'true';
+           document.querySelector('form').appendChild(hiddenInput);
+           
+           // Update UI
+           document.getElementById('avatar-preview-img').style.display = 'none';
+           
+           // Create placeholder if it doesn't exist
+           let placeholder = document.getElementById('avatar-placeholder');
+           if (!placeholder) {
+             placeholder = document.createElement('div');
+             placeholder.id = 'avatar-placeholder';
+             placeholder.className = 'avatar-placeholder';
+             placeholder.innerHTML = '<i class="fas fa-user"></i>';
+             document.querySelector('.avatar-preview').appendChild(placeholder);
+           }
+           placeholder.style.display = 'flex';
+           
+           // Reset file input
+           document.getElementById('avatar').value = '';
+         });
+       }
+   
+       </script>
+
   </body>
 </html>
