@@ -4,8 +4,8 @@
   "main": "app.js",
   "type": "module",
   "scripts": {
-    "dev": "node --env-file=.env --watch app.js ",
-    "start": "node --env-file=.env app.js",
+    "dev": "node --watch app.js ",
+    "start": "node app.js",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
